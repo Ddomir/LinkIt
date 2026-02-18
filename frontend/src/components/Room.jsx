@@ -1,3 +1,5 @@
+import { getAll } from "../api/test"
+
 const roomData = {
     name: "Room1",
     icon: 1,
@@ -30,7 +32,7 @@ export default function Room() {
             bg-linear-120 from-slate-400 to-slate-700 
             rounded-l-4xl p-5
             text-5xl font-bold">
-            <h1>{roomData.name}</h1>
+            <h1 onClick={async () => { console.log(await getAll()) }}>{roomData.name}</h1>
         </div>
     )
 }
