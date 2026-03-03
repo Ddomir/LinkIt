@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import Room from './components/Room'
 
@@ -10,11 +9,9 @@ function App() {
       <div className="w-100 h-full p-4">
         <Sidebar />
       </div>
-      
 
       <Room />
     </div>
-      
     </>
   )
 }

@@ -7,11 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed": "node src/api/seed.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.96.0",
     "@tailwindcss/vite": "^4.1.18",
+    "dotenv": "^17.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18"
