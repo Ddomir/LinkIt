@@ -7,7 +7,7 @@ function RoomIconByName({ name, className = "w-4 h-4" }) {
     return <span className={className}>{icon.svg}</span>;
 }
 
-export default function Sidebar() {
+export default function Sidebar({callback}) {
     const [rooms, setRooms] = useState([])
     const [selectedRoomId, setSelectedRoomId] = useState(null)
     const [showPopup, setShowPopup] = useState(false)
