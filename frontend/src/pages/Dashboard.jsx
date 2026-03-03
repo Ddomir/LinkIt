@@ -1,7 +1,5 @@
-import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
-import { ca } from 'react-day-picker/locale';
 
 export default function Dashboard({callback}) {
   return (
