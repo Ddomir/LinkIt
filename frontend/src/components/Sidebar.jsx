@@ -51,6 +51,17 @@ export default function Sidebar() {
                         </button>
                     ))}
                 </div>
+
+                <div className="flex flex-grow">
+                </div>
+
+                <button
+                    className="bg-[#87F6B7] rounded-full text-[#0C0A0A] text-2xl p-2 px-8 cursor-pointer hover:scale-105 transition ease-in-out justify-self-center m-4"
+                    onClick={callback}
+                    id="google-logout-btn"
+                >
+                    Logout
+                </button>
             </div>
 
             {/* Bottom bar */}
