@@ -5,8 +5,8 @@ function App() {
 
   return (
     <>
-    <div className='w-screen h-screen flex bg-slate-900'>
-      <div className="w-100 h-full p-4">
+    <div className='w-screen h-screen flex'>
+      <div className="w-100 h-full">
         <Sidebar />
       </div>
 
