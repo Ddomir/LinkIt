@@ -74,14 +74,9 @@ function App() {
 						>
 							Sign in with Google
 						</button>
-
-						{/* <p className="underline">
-                  <a>
-                    Don't have an account? Sign up.
-                  </a>
-                </p> */}
 					</div>
 				</div>
+        
         }
 			</div>
 		</>
