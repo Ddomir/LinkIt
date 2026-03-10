@@ -46,7 +46,7 @@ function App() {
 
         { session ?
         // logged in
-        <Dashboard callback={handleLogout}/>
+        <Dashboard callback={handleLogout} userId={session.user.id}/>
         :
         // login page
 				<div className="flex justify-center items-center flex-col gap-4">
