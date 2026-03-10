@@ -7,3 +7,5 @@ for (const table of TABLES) {
   if (error) throw error;
   console.log(`Cleared: ${table}`);
 }
+
+// Hello world
