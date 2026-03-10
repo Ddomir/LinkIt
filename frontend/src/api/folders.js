@@ -31,6 +31,23 @@ export async function removeFolder(id) {
   if (error) throw error
 }
 
-// TODO: additional functions
-// get folders by room or get parent room by folder id
-// 
+// determine if link has a parent folder
+export async function folderHasParent(id) {
+  const { data, error } = await supabase.from('folders').select('*').eq('folder_id', id).single()
+  if (error) throw error
+  return (data != null)
+}
+
+// get parent folder
+export async function getParentFolderByFolderId(id) {
+  const { data, error } = await supabase.from('folders').select('*').eq('folder_id', id).single()
+  if (error) throw error
+  return data
+}
+
+// get parent room
+export async function getParentRoomByFolderId(id) {
+  const { data, error } = await supabase.from('folders').select('*').eq('room_id', id).single()
+  if (error) throw error
+  return data
+}
