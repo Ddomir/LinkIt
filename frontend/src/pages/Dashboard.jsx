@@ -4,14 +4,15 @@ import Room from '../components/Room'
 export default function Dashboard({callback}) {
   return (
     <>
-    <div className='w-screen h-screen flex bg-slate-900'>
-      <div className="w-100 h-full p-4">
-        <Sidebar callback={callback} />
+      <div className="w-screen h-screen flex">
+        <div className="flex-none h-full">
+          <Sidebar callback={callback} />
+        </div>
+
+        <div className="flex-1 min-h-0 h-full">
+          <Room />
+        </div>
       </div>
-      
-      <Room />
-    </div>
-      
     </>
   )
 }
