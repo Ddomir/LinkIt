@@ -1,36 +1,63 @@
+import MainContent from "./MainContent"
+import {ICONS} from "./CreateRoomPopup"
 const roomData = {
-    name: "Room1",
+    name: "ACM SIG WebDev",
     icon: 1,
     links: {
-        1: {
-            title: "Link1",
-            linkTo: "www.google.com",
-            color: 1,
-            isPinned: false
+        1: {//link card example
+            id: 1,
+            type: "link",
+            title: "2/17 Figma Presentation",
+            link: "https://www.docs.google.com/presentation/d/1Xow9n8j3l7qjvawdawd2aYpXoQZsJkLh5e5z6a7b8c9d0e1f2g/edit?usp=sharing",
+            roomid: 123,
+            color: "87F6B7",
+            icon: ICONS[0].name,
+            isPinned: true,
+            folderid: null, //not in a folder
+            createdAt: "2026-03-09T23:00:00"
         },
-        2: {
-            title: "Link1",
-            linkTo: "www.google.com",
-            color: 1,
-            isPinned: false
+        2: {//link card example
+            id: 2,
+            type: "link",
+            title: "LinkIt File",
+            link: "www.google.com",
+            roomid: 123,
+            color: "ECACEC",
+            icon: ICONS[0].name,
+            isPinned: false,
+            folderid: null, //not in a folder
+            createdAt: "2026-03-09T23:00:00"
         },
-        3: {
-            title: "Link1",
-            linkTo: "www.google.com",
-            color: 1,
-            isPinned: false
+        3: {//folder card example
+            id: 3,
+            type: "folder",
+            title: "Presentations",
+            links: ["www.google.com", "www.bing.com", "www.yahoo.com", "jacksonvillespaghettimonster.com"],
+            color: "ACDDEC",
+            icon: ICONS[0].name,
+            isPinned: false,
+            parentfolder: 3, //not in a folder, but required for folder cards. Set to own id or null?
+            createdAt: "2026-03-09T23:00:00"
+        },
+        4: {//folder card example
+            id: 4,
+            type: "folder",
+            title: "Presentations",
+            links: ["www.google.com", "www.bing.com", "www.yahoo.com"],
+            color: "ACDDEC",
+            icon: ICONS[0].name,
+            isPinned: false,
+            parentfolder: 4,
+            createdAt: "2026-03-09T23:00:00"
         }
     }
 }
 
 export default function Room() {
     return (
-        <div className="
-            w-full h-full 
-            bg-linear-120 from-slate-400 to-slate-700 
-            rounded-l-4xl p-5
-            text-5xl font-bold">
-            <h1>{roomData.name}</h1>
+        <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
+            <h1 className="p-3 text-[#77f298]">{roomData.name}</h1>
+            <MainContent roomData={roomData} />
         </div>
     )
 }
