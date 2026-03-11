@@ -12,8 +12,33 @@ export async function getInviteById(id) {
   return data
 }
 
-// content = link content
-export async function createInvite(room_id, content) {
+// helper function for createInvite
+function generateRandomString() {
+  var result = "";
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  for ( var i = 0; i < 10; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  console.log("INVITE CODE: ", result);
+  return result;
+} 
+
+// second helper function
+async function inviteCodeExists(content) {
+  const { data, error } = await supabase.from('invites').select('*').eq('link', content)
+  if (error) throw error
+  return (data.length != 0)
+}
+
+export async function createInvite(room_id) {
+  var content = generateRandomString();
+
+  // figure out of that string already exists as an invite code
+  console.log(await inviteCodeExists(content))
+  // while (inviteCodeExists(content)) { // if it exists
+  //   content = generateRandomString() // generate a new one
+  // }
+
   const { data, error } = await supabase.from('invites').insert({ room_id: room_id, link: content }).select().single()
   if (error) throw error
   return data

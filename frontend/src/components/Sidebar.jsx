@@ -1,10 +1,23 @@
 import React, { useState } from "react";
 import CreateRoomPopup, { ICONS } from "./CreateRoomPopup";
 
+import { createInvite } from "../api/invites"
+
 function RoomIconByName({ name, className = "w-4 h-4" }) {
     const icon = ICONS.find(i => i.name === name);
     if (!icon) return null;
     return <span className={className}>{icon.svg}</span>;
+}
+
+// DELETE THIS WHEN FULLY IMPLEMENTING ROOM CREATION
+function testingInvites() {
+    createInvite(1) // replace this argument with the room_id when room is created
+    .then(result => {
+        console.log("✅ Invite creation success: ", result);
+    })
+    .catch(error => {
+        console.log("❌ Invite creation failed: ", error);
+    });
 }
 
 export default function Sidebar({callback, userId}) {
@@ -63,6 +76,14 @@ export default function Sidebar({callback, userId}) {
                     id="google-logout-btn"
                 >
                     Logout
+                </button>
+
+
+                <button
+                    className="bg-[#87F6B7] rounded-full text-[#0C0A0A] text-2xl p-2 px-8 cursor-pointer hover:scale-105 transition ease-in-out justify-self-center m-4"
+                    onClick={testingInvites}
+                >
+                    TESTING INVITES
                 </button>
             </div>
 
