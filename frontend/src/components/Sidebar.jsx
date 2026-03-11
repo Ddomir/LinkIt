@@ -7,7 +7,7 @@ function RoomIconByName({ name, className = "w-4 h-4" }) {
     return <span className={className}>{icon.svg}</span>;
 }
 
-export default function Sidebar({callback}) {
+export default function Sidebar({callback, userId}) {
     const [rooms, setRooms] = useState([])
     const [selectedRoomId, setSelectedRoomId] = useState(null)
     const [showPopup, setShowPopup] = useState(false)
@@ -35,6 +35,8 @@ export default function Sidebar({callback}) {
                     </button>
                 </div>
             </div>
+
+            <p>{userId}</p>
 
             {/* Room list */}
             <div className="flex-1 overflow-auto px-3 py-1 scrollbar-thin">
