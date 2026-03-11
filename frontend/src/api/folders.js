@@ -31,23 +31,23 @@ export async function removeFolder(id) {
   if (error) throw error
 }
 
-// determine if link has a parent folder
+// determine if folder has a parent folder
 export async function folderHasParent(id) {
   const { data, error } = await supabase.from('folders').select('*').eq('folder_id', id).single()
   if (error) throw error
   return (data != null)
 }
 
-// get parent folder
+// get parent folder id
 export async function getParentFolderByFolderId(id) {
-  const { data, error } = await supabase.from('folders').select('*').eq('folder_id', id).single()
+  const { data, error } = await supabase.from('folders').select('folder_id').eq('id', id).single()
   if (error) throw error
   return data
 }
 
-// get parent room
+// get parent room id
 export async function getParentRoomByFolderId(id) {
-  const { data, error } = await supabase.from('folders').select('*').eq('room_id', id).single()
+  const { data, error } = await supabase.from('folders').select('room_id').eq('id', id).single()
   if (error) throw error
   return data
 }

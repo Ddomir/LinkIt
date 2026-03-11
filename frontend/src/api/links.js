@@ -41,14 +41,14 @@ export async function linkHasParent(id) {
 
 // get parent folder
 export async function getParentFolderByLinkId(id) {
-  const { data, error } = await supabase.from('links').select('*').eq('folder_id', id).single()
+  const { data, error } = await supabase.from('links').select('folder_id').eq('id', id).single()
   if (error) throw error
   return data
 }
 
-// get parent room
+// get parent room id
 export async function getParentRoomByLinkId(id) {
-  const { data, error } = await supabase.from('links').select('*').eq('room_id', id).single()
+  const { data, error } = await supabase.from('links').select('room_id').eq('id', id).single()
   if (error) throw error
   return data
 }

@@ -6,6 +6,9 @@ import { supabase } from '../../supabaseClient'
 // IF THIS MESSAGE HAS NOT BEEN DELETED, BRING THIS TO THE ATTENTION OF
 // ANDRES
 
+// type shit
+// dominic
+
 //GETTERS
 /**
     Get the icon corresponding to a specified id
