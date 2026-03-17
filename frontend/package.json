@@ -8,7 +8,18 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "node src/api/seed.js",
+    
+    "seedRoles": "node src/seed/roles.js",
+    "seedColors": "node src/seed/colors.js",
+    "seedIcons": "node src/seed/icons.js",
+    "seedRooms": "node src/seed/rooms.js",
+    "seedInvites": "node src/seed/invites.js",
+    "seedFolders": "node src/seed/folders.js",
+    "seedLinks": "node src/seed/links.js",
+    "seedAll": "node src/seed/all.js",
+
+    "test": "node src/api/test.js",
+
     "clear": "node src/api/clear.js"
   },
   "dependencies": {
