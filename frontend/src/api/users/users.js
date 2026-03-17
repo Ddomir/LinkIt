@@ -54,12 +54,23 @@ export async function getUserJoinedRooms(UID) {
     Parameters:
         id      This is the user id
 */
-// export async function getUser(id) {
-//   const { data, error } = await supabase
-//     .from('users')
-//     .select('*')
-//     .eq('id', id)
-//     .single()
+export async function getUser(UUID) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('UUID', UUID)
+    .single()
+
+    //Catches errors
+    if(error){
+        console.error("❌ Get data Failed:", error.message);
+        throw error;
+    }else{
+        console.log("✅ Get data Success! Data:", data);
+    }
+    //Returns the data
+    return data
+}
 
 //     //Catches errors
 //     if(error){
@@ -72,23 +83,16 @@ export async function getUserJoinedRooms(UID) {
 //     return data
 // }
 
-// //SETTERS
-// /**
-//  * Create a new user in the table
-//  * Parameters:
-//  *      userName    The desired name of the user
-//  *      userEmail   The users respective email
-//  */
-
-// export async function createUser(userName, userEmail){
-//     const { data, error } = await supabase
-//         .from('users')
-//         .insert({ 
-//             name: userName,
-//             email: userEmail
-//         })
-//         .select()
-//         .single()
+export async function createUser(userId, userName, userEmail){
+    const { data, error } = await supabase
+        .from('users')
+        .upsert({ 
+            UUID: userId,
+            name: userName,
+            email: userEmail
+        })
+        .select()
+        .single()
     
 //     //Catches errors
 //     if(error){
@@ -100,19 +104,29 @@ export async function getUserJoinedRooms(UID) {
 //     return data
 // }
 
-// /**
-//  *  Update the username base on id
-//  *  Parameters:
-//  *     id          icon id
-//  *     userName    The new username
-//  */
-// export async function updateUsername(id, userName){
-//   const { data, error } = await supabase
-//     .from('users')
-//     .update({ name: userName })
-//     .eq('id', id)
-//     .select()           //Gets the entire updated row sent back
-//     .single()           //Only send that row back
+/**
+ *  Update the username base on id
+ *  Parameters:
+ *     UUID        Username id
+ *     userName    The new username
+ */
+export async function updateUsername(id, userName){
+  const { data, error } = await supabase
+    .from('users')
+    .update({ name: userName })
+    .eq('UUID', id)
+    .select()           //Gets the entire updated row sent back
+    .single()           //Only send that row back
+
+    //Catches errors
+    if(error){
+        console.error("❌ Update Failed:", error.message);
+        throw error;
+    }else{
+        console.log("✅ Update Success! Data:", data);
+    }
+    return data
+}
 
 //     //Catches errors
 //     if(error){
