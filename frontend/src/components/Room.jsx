@@ -1,5 +1,7 @@
 import MainContent from "./MainContent"
 import {ICONS} from "./CreateRoomPopup"
+import Search from "./Search"
+
 const roomData = {
     name: "ACM SIG WebDev",
     icon: 1,
@@ -57,6 +59,7 @@ export default function Room() {
     return (
         <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
             <h1 className="p-3 text-[#77f298]">{roomData.name}</h1>
+            <Search /> {/* search component with input and buttons */}
             <MainContent roomData={roomData} />
         </div>
     )
