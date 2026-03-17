@@ -2,6 +2,7 @@ import "./index.css";
 import { useState, useEffect } from "react";
 import { supabase } from './supabaseClient';
 import Dashboard from './pages/Dashboard';
+import { createRoom } from "./api/rooms/rooms";
 
 function App() {
 	const [session, setSession] = useState(false);
@@ -45,8 +46,8 @@ function App() {
 			<div className="w-screen h-screen justify-center items-center flex bg-slate-900">
 
         { session ?
-        // logged in
-        <Dashboard callback={handleLogout}/>
+        // logged in. And pass the session down
+        <Dashboard session={session} callback={handleLogout}/>
         :
         // login page
 				<div className="flex justify-center items-center flex-col gap-4">

@@ -13,11 +13,11 @@ import { supabase } from '../../supabaseClient'
     Parameters:
         id      This is the user id
 */
-export async function getUser(id) {
+export async function getUser(UUID) {
   const { data, error } = await supabase
     .from('users')
     .select('*')
-    .eq('id', id)
+    .eq('UUID', UUID)
     .single()
 
     //Catches errors
@@ -39,10 +39,11 @@ export async function getUser(id) {
  *      userEmail   The users respective email
  */
 
-export async function createUser(userName, userEmail){
+export async function createUser(userId, userName, userEmail){
     const { data, error } = await supabase
         .from('users')
-        .insert({ 
+        .upsert({ 
+            UUID: userId,
             name: userName,
             email: userEmail
         })
@@ -62,14 +63,14 @@ export async function createUser(userName, userEmail){
 /**
  *  Update the username base on id
  *  Parameters:
- *     id          icon id
+ *     UUID        Username id
  *     userName    The new username
  */
 export async function updateUsername(id, userName){
   const { data, error } = await supabase
     .from('users')
     .update({ name: userName })
-    .eq('id', id)
+    .eq('UUID', id)
     .select()           //Gets the entire updated row sent back
     .single()           //Only send that row back
 
