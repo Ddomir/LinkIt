@@ -11,7 +11,7 @@ function RoomIconByName({ name, className = "w-4 h-4" }) {
 
 // DELETE THIS WHEN FULLY IMPLEMENTING ROOM CREATION
 function testingInvites() {
-    createInvite(1) // replace this argument with the room_id when room is created
+    createInvite(42) // replace this argument with the room_id when room is created
     .then(result => {
         console.log("✅ Invite creation success: ", result);
     })
