@@ -102,7 +102,7 @@ export async function createUser(userId, userName, userEmail){
 //         console.log("✅ Insert Success! Data:", data);
 //     }
 //     return data
-// }
+}
 
 /**
  *  Update the username base on id
