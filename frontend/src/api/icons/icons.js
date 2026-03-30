@@ -14,7 +14,7 @@ import { supabase } from '../../supabaseClient'
 export async function getAllIcons() {
     const { data, error } = await supabase
     .from('icons')
-    .select('icon_name')
+    .select('*')
 
     //Catches errors
     if(error){

@@ -57,7 +57,7 @@ const TEMP_ICONS = [
 export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
     const [ICONS, setIcons] = useState([]);
     const [roomName, setRoomName] = useState("");
-    const [selectedIcon, setSelectedIcon] = useState("");
+    const [selectedIcon, setSelectedIcon] = useState(1);
 
     useEffect(() => {
         const fetchIcons = async () => { 
@@ -80,7 +80,7 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
         if (!roomName.trim()) return;      
         onCreate({ name: roomName.trim(), icon: selectedIcon });
         setRoomName("");
-        setSelectedIcon("");
+        setSelectedIcon(1);
     };
 
     return (
@@ -111,9 +111,9 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
                         <button
                             key={icon.icon_name}
                             type="button"
-                            onClick={() => setSelectedIcon(icon.icon_name)}
+                            onClick={() => setSelectedIcon(icon.id)}
                             className={`p-2 rounded-lg border transition-colors duration-150 cursor-pointer
-                                ${selectedIcon === icon.icon_name
+                                ${selectedIcon === icon.id
                                     ? "bg-[#77f298] text-black border-[#77f298]"
                                     : "border-white/10 text-gray-400 hover:text-white hover:border-white/30"
                                 }`}
