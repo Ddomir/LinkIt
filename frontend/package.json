@@ -8,7 +8,6 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    
     "seedRoles": "node src/seed/roles.js",
     "seedColors": "node src/seed/colors.js",
     "seedIcons": "node src/seed/icons.js",
@@ -17,15 +16,14 @@
     "seedFolders": "node src/seed/folders.js",
     "seedLinks": "node src/seed/links.js",
     "seedAll": "node src/seed/all.js",
-
     "test": "node src/api/test.js",
-
     "clear": "node src/api/clear.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
     "@tailwindcss/vite": "^4.1.18",
     "dotenv": "^17.3.1",
+    "lucide-react": "^1.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18"

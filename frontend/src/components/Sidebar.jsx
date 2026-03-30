@@ -1,33 +1,16 @@
 import React, { useState } from "react";
-import CreateRoomPopup, { ICONS } from "./CreateRoomPopup";
+import CreateRoomPopup from "./CreateRoomPopup";
+import { DynamicIcon } from 'lucide-react/dynamic';
 
-function RoomIconByName({ name, className = "w-4 h-4" }) {
-    const icon = ICONS.find(i => i.name === name);
-    if (!icon) return null;
-    return <span className={className}>{icon.svg}</span>;
-}
 
 export default function Sidebar({rooms, createRoomsDB, callback}) {
     //const [rooms, setRooms] = useState([])
     const [selectedRoomId, setSelectedRoomId] = useState(null)
     const [showPopup, setShowPopup] = useState(false)
-    const ICON_MAP = {
-        link: 1,
-        code: 2,
-        wifi: 3,
-        star: 4,
-        bolt: 5,
-        book: 6,
-        heart: 7,
-        music: 8,
-        image: 9,
-        video: 20,
-        globe: 24
-    };
 
     const handleCreateRoom = ({ name, icon }) => {
-        createRoomsDB(name, ICON_MAP[icon]);
-        setShowPopup(false)
+        createRoomsDB(name, icon);
+        setShowPopup(false);
     }
 
     return (
@@ -60,7 +43,8 @@ export default function Sidebar({rooms, createRoomsDB, callback}) {
                             className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
                                 ${selectedRoomId === room.id ? 'bg-[#77f298] text-black': 'hover:bg-[#77f298]/15 hover:text-white'}`}
                         >
-                            <RoomIconByName name={room.icon} className="w-4 h-4 shrink-0 [&>svg]:w-4 [&>svg]:h-4" />
+                            <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
+
                             <span className="truncate">{room.name}</span>
                         </button>
                     ))}

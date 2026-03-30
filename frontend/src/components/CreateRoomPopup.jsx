@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { DynamicIcon } from 'lucide-react/dynamic';
+import { getAllIcons } from "../api/icons/icons";
 
-const ICONS = [
+const TEMP_ICONS = [
     {
         name: "link",
         svg: (
@@ -51,17 +53,34 @@ const ICONS = [
     },
 ];
 
+
 export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
+    const [ICONS, setIcons] = useState([]);
     const [roomName, setRoomName] = useState("");
-    const [selectedIcon, setSelectedIcon] = useState(ICONS[0].name);
+    const [selectedIcon, setSelectedIcon] = useState("");
+
+    useEffect(() => {
+        const fetchIcons = async () => { 
+            try {
+                const response = await getAllIcons();
+                console.log(response[0].icon_name)
+                setIcons(response);
+            } 
+            catch (error) {
+                console.error("Error fetching icons:", error);
+            }
+        };
+
+        fetchIcons(); 
+    }, []);
 
     if (!isOpen) return null;
 
-    const handleCreate = () => {
-        if (!roomName.trim()) return;
+    const handleCreate = async () => {
+        if (!roomName.trim()) return;      
         onCreate({ name: roomName.trim(), icon: selectedIcon });
         setRoomName("");
-        setSelectedIcon(ICONS[0].name);
+        setSelectedIcon("");
     };
 
     return (
@@ -88,18 +107,19 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
 
                 <label className="block text-sm text-gray-400 mt-5 mb-2">Symbol</label>
                 <div className="flex gap-2 flex-wrap">
-                    {ICONS.map((icon) => (
+                    {Array.from(ICONS).map((icon) => (
                         <button
-                            key={icon.name}
+                            key={icon.icon_name}
                             type="button"
-                            onClick={() => setSelectedIcon(icon.name)}
+                            onClick={() => setSelectedIcon(icon.icon_name)}
                             className={`p-2 rounded-lg border transition-colors duration-150 cursor-pointer
-                                ${selectedIcon === icon.name
+                                ${selectedIcon === icon.icon_name
                                     ? "bg-[#77f298] text-black border-[#77f298]"
                                     : "border-white/10 text-gray-400 hover:text-white hover:border-white/30"
                                 }`}
                         >
-                            {icon.svg}
+                            {/* dynamic icon renderer */}
+                            <DynamicIcon name={icon.icon_name} color="currentColor" size={24} strokeWidth={2} />
                         </button>
                     ))}
                 </div>
@@ -126,4 +146,3 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
     );
 }
 
-export { ICONS };
