@@ -1,5 +1,4 @@
 import React from 'react';
-import { ICONS } from './CreateRoomPopup';
 
 export default function FolderCard({ id, type, title, links, roomid, color, icon, pinned, parentfolder, createdAt }) {
     const hex = color ? (`#${String(color).replace('#', '')}`) : '#87F6B7';

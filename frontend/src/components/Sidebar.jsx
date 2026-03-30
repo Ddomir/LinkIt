@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import CreateRoomPopup, { ICONS } from "./CreateRoomPopup";
+import CreateRoomPopup from "./CreateRoomPopup";
+import { DynamicIcon } from 'lucide-react/dynamic';
 
 import { createInvite } from "../api/invites"
 
@@ -20,14 +21,14 @@ function testingInvites() {
     });
 }
 
-export default function Sidebar({callback, userId}) {
-    const [rooms, setRooms] = useState([])
+export default function Sidebar({rooms, createRoomsDB, callback}) {
+    //const [rooms, setRooms] = useState([])
     const [selectedRoomId, setSelectedRoomId] = useState(null)
     const [showPopup, setShowPopup] = useState(false)
 
     const handleCreateRoom = ({ name, icon }) => {
-        setRooms(prev => [...prev, { id: Date.now(), name, icon }])
-        setShowPopup(false)
+        createRoomsDB(name, icon);
+        setShowPopup(false);
     }
 
     return (
@@ -49,8 +50,7 @@ export default function Sidebar({callback, userId}) {
                 </div>
             </div>
 
-            <p>{userId}</p>
-
+            {/* <p>{sessionStorage.user?.id}</p> */}
             {/* Room list */}
             <div className="flex-1 overflow-auto px-3 py-1 scrollbar-thin">
                 <div className="flex flex-col gap-1">
@@ -61,7 +61,8 @@ export default function Sidebar({callback, userId}) {
                             className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
                                 ${selectedRoomId === room.id ? 'bg-[#77f298] text-black': 'hover:bg-[#77f298]/15 hover:text-white'}`}
                         >
-                            <RoomIconByName name={room.icon} className="w-4 h-4 shrink-0 [&>svg]:w-4 [&>svg]:h-4" />
+                            <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
+
                             <span className="truncate">{room.name}</span>
                         </button>
                     ))}
@@ -92,7 +93,7 @@ export default function Sidebar({callback, userId}) {
 
                 <button className="hover:text-[#77f298] cursor-pointer transition-colors duration-150" aria-label="Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+                        <path fillRule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
                     </svg>
                 </button>
 

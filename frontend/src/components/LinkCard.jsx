@@ -1,5 +1,4 @@
 import React from 'react';
-import { ICONS } from './CreateRoomPopup';
 
 export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt}) {
     const hex = color ? (`#${String(color).replace('#', '')}`) : '#87F6B7';

@@ -10,6 +10,23 @@ import { supabase } from '../../supabaseClient'
 // dominic
 
 //GETTERS
+
+export async function getAllIcons() {
+    const { data, error } = await supabase
+    .from('icons')
+    .select('*')
+
+    //Catches errors
+    if(error){
+        console.error("❌ Get data Failed:", error.message);
+        throw error;
+    }else{
+        console.log("✅ Get icons data Success! Data:", data);
+    }
+    //Returns the data
+    return data
+}
+
 /**
     Get the icon corresponding to a specified id
     Parameters:

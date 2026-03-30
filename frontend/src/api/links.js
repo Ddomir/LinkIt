@@ -36,7 +36,7 @@ export async function removeLink(id) {
 export async function linkHasParent(id) {
   const { data, error } = await supabase.from('links').select('*').eq('folder_id', id).single()
   if (error) throw error
-  return (data != null)
+  return (data.length != 0)
 }
 
 // get parent folder

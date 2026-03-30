@@ -10,16 +10,15 @@ import { supabase } from '../../supabaseClient'
 
 //GETTER FUNCTIONS
 /**
-    Get the data of a room
+    Get all the rooms associated with a given user
     Parameters:
-        id      This is the room id
+        UUID      This is the creator id of the room
 */
-export async function getRoom(id) {
+export async function fetchRooms(UUID) {
   const { data, error } = await supabase
     .from('rooms')
     .select('*')
-    .eq('id', id)
-    .single()
+    .eq('creator_ID', UUID)
 
     //Catches errors
     if(error){
@@ -38,10 +37,10 @@ export async function getRoom(id) {
     Parameters:
         user_id     The id of the user in the public.users table
         room_name   The desired name of the room. Defaults to "Untitled Room"
-        isPrivate   The view status of the room. Defaults to "true"
+        isPrivate   The view status of the room. Defaults to "false"
         iconId      The id of the user in the public.icon table. Defaults to "null"
 */
-export async function createRoom(user_id, room_name = "Untitled Room", isPrivate = true, iconId = null){
+export async function createRoom(user_id, room_name = "Untitled Room", isPrivate = false, iconId = null){
     console.log("Attempting to insert:", user_id);
 
     const { data, error } = await supabase
