@@ -51,3 +51,10 @@ export async function getParentRoomByFolderId(id) {
   if (error) throw error
   return data
 }
+
+// get all folders in a room
+export async function getFoldersByRoomId(room_id) {
+  const { data, error } = await supabase.from('folders').select('*').eq('room_id', room_id)
+  if (error) throw error
+  return data
+}

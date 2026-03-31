@@ -11,9 +11,7 @@ function RoomIconByName({ name, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback}) {
-    //const [rooms, setRooms] = useState([])
-    const [selectedRoomId, setSelectedRoomId] = useState(null)
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom}) {
     const [showPopup, setShowPopup] = useState(false)
 
     const handleCreateRoom = ({ name, icon }) => {
@@ -47,7 +45,7 @@ export default function Sidebar({rooms, createRoomsDB, callback}) {
                     {rooms.map(room => (
                         <button
                             key={room.id}
-                            onClick={() => setSelectedRoomId(room.id)}
+                            onClick={() => onSelectRoom(room.id)}
                             className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
                                 ${selectedRoomId === room.id ? 'bg-[#77f298] text-black': 'hover:bg-[#77f298]/15 hover:text-white'}`}
                         >

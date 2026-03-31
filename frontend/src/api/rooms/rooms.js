@@ -9,6 +9,12 @@ import { supabase } from '../../supabaseClient'
 
 
 //GETTER FUNCTIONS
+export async function getRoomById(id) {
+  const { data, error } = await supabase.from('rooms').select('*').eq('id', id).single()
+  if (error) throw error
+  return data
+}
+
 /**
     Get all the rooms associated with a given user
     Parameters:

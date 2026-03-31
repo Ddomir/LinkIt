@@ -1,80 +1,95 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainContent from "./MainContent"
 import ShareInvite from "./ShareInvite";
-import Search from "./Search"
+import { getLinksByRoomId } from "../api/links";
+import { getFoldersByRoomId } from "../api/folders";
+import { getRoomById } from "../api/rooms/rooms";
+import { supabase } from "../supabaseClient";
 
-const roomData = {
-    name: "ACM SIG WebDev",
-    icon: 1,
-    links: {
-        1: {//link card example
-            id: 1,
-            type: "link",
-            title: "2/17 Figma Presentation",
-            link: "https://www.docs.google.com/presentation/d/1Xow9n8j3l7qjvawdawd2aYpXoQZsJkLh5e5z6a7b8c9d0e1f2g/edit?usp=sharing",
-            roomid: 123,
-            color: "87F6B7",
-            icon: "wifi",
-            isPinned: true,
-            folderid: null, //not in a folder
-            createdAt: "2026-03-09T23:00:00"
-        },
-        2: {//link card example
-            id: 2,
-            type: "link",
-            title: "LinkIt File",
-            link: "www.google.com",
-            roomid: 123,
-            color: "ECACEC",
-            icon: "code",
-            isPinned: false,
-            folderid: null, //not in a folder
-            createdAt: "2026-03-09T23:00:00"
-        },
-        3: {//folder card example
-            id: 3,
-            type: "folder",
-            title: "Presentations",
-            links: ["www.google.com", "www.bing.com", "www.yahoo.com", "jacksonvillespaghettimonster.com"],
-            color: "ACDDEC",
-            icon: "globe",
-            isPinned: false,
-            parentfolder: 3, //not in a folder, but required for folder cards. Set to own id or null?
-            createdAt: "2026-03-09T23:00:00"
-        },
-        4: {//folder card example
-            id: 4,
-            type: "folder",
-            title: "Presentations",
-            links: ["www.google.com", "www.bing.com", "www.yahoo.com"],
-            color: "ACDDEC",
-            icon: "star",
-            isPinned: false,
-            parentfolder: 4,
-            createdAt: "2026-03-09T23:00:00"
-        }
-    }
-}
-
-const inviteData = {
-    id: 1,
-    createdAt: "2026-03-09T23:00:00",
-    roomID: 1,
-    link: "ABCDEFGHIJ"
-}
-
-export default function Room() {
+export default function Room({ roomId }) {
     const [showInvitePopup, setInvitePopup] = useState(false)
+    const [roomData, setRoomData] = useState(null)
+    const [inviteData, setInviteData] = useState(null)
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (!roomId) return
+
+        const fetchRoomContent = async () => {
+            setLoading(true)
+            try {
+                const [room, links, folders] = await Promise.all([
+                    getRoomById(roomId),
+                    getLinksByRoomId(roomId),
+                    getFoldersByRoomId(roomId),
+                ])
+
+                const linksMap = {}
+                links.forEach(l => {
+                    linksMap[l.id] = {
+                        id: l.id,
+                        type: l.type,
+                        title: l.title,
+                        link: l.links?.[0] ?? "",
+                        roomid: l.room_id,
+                        color: l.color,
+                        icon: l.icon,
+                        isPinned: l.pinned ?? false,
+                        folderid: l.parentfolder,
+                        createdAt: l.createdAt,
+                    }
+                })
+                folders.forEach(f => {
+                    linksMap[`f_${f.id}`] = {
+                        id: f.id,
+                        type: "folder",
+                        title: f.title,
+                        links: [],
+                        color: f.color,
+                        icon: f.icon,
+                        isPinned: f.pinned ?? false,
+                        parentfolder: f.folder_id,
+                        createdAt: f.created_at,
+                    }
+                })
+
+                setRoomData({ name: room.name, links: linksMap })
+
+                const invRes = await supabase.from('invites').select('*').eq('room_id', roomId).single()
+                if (!invRes.error) setInviteData(invRes.data)
+            } catch (err) {
+                console.error("Failed to fetch room content:", err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchRoomContent()
+    }, [roomId])
+
+    if (!roomId) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-linear-120 from-[#1E221D] to-[#0E100E]">
+                <p className="text-[#77f298] text-xl">Select a room to get started</p>
+            </div>
+        )
+    }
+
+    if (loading) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-linear-120 from-[#1E221D] to-[#0E100E]">
+                <p className="text-[#77f298] text-xl">Loading...</p>
+            </div>
+        )
+    }
 
     return (
         <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
             <div className="flex flex-row justify-between">
-                <h1 className="p-3 text-[#77f298]">{roomData.name}</h1>
+                <h1 className="p-3 text-[#77f298]">{roomData?.name}</h1>
                 <div className="flex flex-row gap-8">
-
-                    {/* share invite button */}
-                    <button 
-                        className="text-[#ffffff] hover:text-[#77f298] cursor-pointer transition-colors duration-150 mx-8" 
+                    <button
+                        className="text-[#ffffff] hover:text-[#77f298] cursor-pointer transition-colors duration-150 mx-8"
                         aria-label="Profile"
                         onClick={() => setInvitePopup(true)}
                     >

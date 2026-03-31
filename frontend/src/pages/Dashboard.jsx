@@ -21,6 +21,7 @@ const REVERSE_ICON_MAP = {
 
 export default function Dashboard({session ,callback}) {
   const [rooms, setRooms] = useState([])
+  const [selectedRoomId, setSelectedRoomId] = useState(null)
 
   // Add a ref to track if we've already synced this specific user ID
   const hasSynced = useRef(false);
@@ -95,10 +96,10 @@ export default function Dashboard({session ,callback}) {
     <>
       <div className="w-screen h-screen flex">
         <div className="flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} />
         </div>
         <div className="flex-1 min-h-0 h-full">
-          <Room />
+          <Room roomId={selectedRoomId} />
         </div>
       </div>
     </>
