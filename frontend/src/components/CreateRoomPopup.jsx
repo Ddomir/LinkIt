@@ -64,6 +64,8 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
     const [ICONS, setIcons] = useState([]);
     const [roomName, setRoomName] = useState("");
     const [selectedIcon, setSelectedIcon] = useState(1);
+    const [joinRoom, setJoinRoom] = useState(false); // false => Create view, true => Join view
+    const [roomCode, setRoomCode] = useState("");
 
     useEffect(() => {
         const fetchIcons = async () => { 
