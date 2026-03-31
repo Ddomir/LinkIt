@@ -1,6 +1,8 @@
 import MainContent from "./MainContent"
 import {ICONS} from "./CreateRoomPopup"
 import Search from "./Search"
+import { useEffect, useState } from "react"
+import { getLinkByRoomId } from "../api/links" 
 
 const roomData = {
     name: "ACM SIG WebDev",
@@ -55,7 +57,12 @@ const roomData = {
     }
 }
 
+
+
 export default function Room() {
+    const [data, setData] = useState([])
+    useEffect(() => getLinkByRoomId(), [])
+
     return (
         <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
             <h1 className="p-3 text-[#77f298]">{roomData.name}</h1>

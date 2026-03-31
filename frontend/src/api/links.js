@@ -12,6 +12,13 @@ export async function getLinkById(id) {
   return data
 }
 
+export async function getLinkByRoomId(room_id) {
+  const { data, error } = await supabase.from('links').select('*').eq('room_id', room_id).single()
+  if (error) throw error
+  return data
+}
+
+
 // name = link content
 // title = title of the link
 export async function createLink(name, title, color, room_id, folder_id) {
