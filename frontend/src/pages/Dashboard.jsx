@@ -1,6 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
+import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef} from 'react'
 
@@ -73,6 +74,8 @@ export default function Dashboard({session ,callback}) {
     try {
       const newRoom = await createRoom(user.id, room_name, private_status, iconId);
       console.log("Room created succsessfully");
+
+      const newRoomInv = await createInvite(newRoom.id);
 
       //UI update
       const formattedNewRoom = {

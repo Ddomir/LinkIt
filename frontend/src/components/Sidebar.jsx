@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import CreateRoomPopup from "./CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
 
+import { createInvite } from "../api/invites"
+
+function RoomIconByName({ name, className = "w-4 h-4" }) {
+    const icon = ICONS.find(i => i.name === name);
+    if (!icon) return null;
+    return <span className={className}>{icon.svg}</span>;
+}
+
 
 export default function Sidebar({rooms, createRoomsDB, callback}) {
     //const [rooms, setRooms] = useState([])
