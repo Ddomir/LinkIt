@@ -1,6 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
+import { createRoomUser } from '../api/rooms/roomUsers'
 import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef} from 'react'
@@ -47,11 +48,14 @@ export default function Dashboard({session ,callback}) {
 
       try {
         const data = await fetchRooms(user.id);
-        const formattedRooms = data.map(room => ({
-          id: room.id,
-          name: room.name,
-          icon: REVERSE_ICON_MAP[room.icon] || 'star' // Convert 5 -> 'link'
-        }));
+        const formattedRooms = [];
+        data.map( (arr) => {
+          formattedRooms.push({
+            id: arr.rooms.id, 
+            name: arr.rooms.name,
+            icon: REVERSE_ICON_MAP[arr.rooms.icon] || 'x' 
+          });
+        });
 
         setRooms(formattedRooms);
       } catch (err) {
@@ -74,9 +78,10 @@ export default function Dashboard({session ,callback}) {
     
     try {
       const newRoom = await createRoom(user.id, room_name, private_status, iconId);
-      console.log("Room created succsessfully");
+      console.log("Room created successfully");
 
-      const newRoomInv = await createInvite(newRoom.id);
+      await createInvite(newRoom.id);
+      await createRoomUser(user.id, newRoom.id, 10); // 10 is the role id for owner!
 
       //UI update
       const formattedNewRoom = {

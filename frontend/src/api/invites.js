@@ -34,7 +34,6 @@ export async function createInvite(room_id) {
   var content = generateRandomString();
 
   // figure out of that string already exists as an invite code
-  console.log(await inviteCodeExists(content))
   if (await inviteCodeExists(content)) { // if it exists
     console.log(content + " is already an invite code!");
     content = generateRandomString() // generate a new one
