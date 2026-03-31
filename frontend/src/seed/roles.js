@@ -1,4 +1,4 @@
-import { adminSupabase } from "./adminClient.js";
+import { adminSupabase } from "../api/adminClient.js";
 
 const { data, error } = await adminSupabase.from('roles').insert([
   { name: "Viewer" },

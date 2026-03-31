@@ -1,6 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { DynamicIcon } from 'lucide-react/dynamic';
+import { getAllIcons } from "../api/icons/icons";
 
-const ICONS = [
+const TEMP_ICONS = [
     {
         id: 1,
         name: "link",
@@ -57,35 +59,33 @@ const ICONS = [
     },
 ];
 
-export default function CreateRoomPopup({ isOpen, onClose, onCreate, creatorId }) {
+
+export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
+    const [ICONS, setIcons] = useState([]);
     const [roomName, setRoomName] = useState("");
-    const [selectedIcon, setSelectedIcon] = useState(ICONS[0].name);
-    const [joinRoom, setJoinRoom] = useState(true); 
-    const [showIconPicker, setShowIconPicker] = useState(false);
-    const [roomCode, setRoomCode] = useState("");
-    const [isPrivate, setIsPrivate] = useState(false);
+    const [selectedIcon, setSelectedIcon] = useState(1);
 
     useEffect(() => {
-        if (isOpen) setIsPrivate(false);//reset private toggle when opening popup
-    }, [isOpen]);
+        const fetchIcons = async () => { 
+            try {
+                const response = await getAllIcons();
+                setIcons(response);
+            } 
+            catch (error) {
+                console.error("Error fetching icons:", error);
+            }
+        };
+
+        fetchIcons(); 
+    }, []);
 
     if (!isOpen) return null;//don't render anything if popup isn't open
 
-    const handleCreate = () => {
-        if (!roomName.trim()) return;
-
-        const iconObj = ICONS.find((i) => i.name === selectedIcon);
-        const props = {
-            creator_id: creatorId,
-            name: roomName.trim(),
-            icon: iconObj ? iconObj.id : null, //numeric icon id
-            is_private: isPrivate,
-        };
-        onCreate(props);
-
+    const handleCreate = async () => {
+        if (!roomName.trim()) return;      
+        onCreate({ name: roomName.trim(), icon: selectedIcon });
         setRoomName("");
-        setJoinRoom(true);
-        setSelectedIcon(ICONS[0].name);
+        setSelectedIcon(1);
     };
 
     const handleJoin = () => {//does nothing for now, implement in the future
@@ -136,49 +136,31 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate, creatorId }
                     placeholder="e.g. ACM WebDev Room"
                     autoFocus
                     className="w-full rounded-lg bg-[#0C0A0A] border border-white/10 text-white placeholder-gray-500 px-3 py-2 text-sm outline-none focus:border-[#77f298]/60 transition-colors"
-                    onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
+                    onKeyDown={(e) => { 
+                        if (e.key === "Enter") 
+                            handleCreate(); 
+                        if (e.key === "Escape")
+                            onClose()
+                        }}
                 />
 
-                {/*Icon selection*/}
-                <div className="flex items-start justify-between mt-2">
-                    <div className="flex items-center gap-4 ml-10">
-                        <div className="text-sm text-gray-400">Icon</div>
-                        <div className="relative">
-                            <button
-                                type="button"
-                                onClick={() => setShowIconPicker((s) => !s)}
-                                className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#2b2b2b] border border-white/10 hover:border-white hover:text-white transition-colors cursor-pointer"
-                            >
-                                {ICONS.find((i) => i.name === selectedIcon)?.svg}
-                            </button>
-
-                            {showIconPicker && (
-                                <div className="absolute mt-2 w-60 bg-[#0C0A0A] border border-white/10 p-2 rounded-lg shadow-lg z-50">
-                                    <div className="grid grid-cols-6 gap-2 animate-[slide-down_100ms_ease-out]">
-                                        {ICONS.map((icon) => (
-                                            <button
-                                                key={icon.name}
-                                                onClick={() => { setSelectedIcon(icon.name); setShowIconPicker(false); }}
-                                                className="w-8 h-8 flex items-center justify-center rounded-md bg-[#1a1a1a] border border-white/10 p-1 hover:bg-[#77f298] hover:text-black transition-colors"
-                                            >
-                                                {icon.svg}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    {/*Private toggle*/}
-                    <div className="flex items-center gap-2 mt-2 mr-15">
-                        <span className="text-sm text-gray-400 mr-2">Private</span>
-                        <input
-                            type="checkbox"
-                            checked={isPrivate === true}
-                            onChange={(e) => setIsPrivate(e.target.checked)}
-                            className="w-5 h-5 text-[#77f298] bg-[#0C0A0A] border border-white/10 rounded focus:ring-[#77f298]/50"
-                        />
-                    </div>
+                <label className="block text-sm text-gray-400 mt-5 mb-2">Symbol</label>
+                <div className="flex gap-2 flex-wrap">
+                    {Array.from(ICONS).map((icon) => (
+                        <button
+                            key={icon.icon_name}
+                            type="button"
+                            onClick={() => setSelectedIcon(icon.id)}
+                            className={`p-2 rounded-lg border transition-colors duration-150 cursor-pointer
+                                ${selectedIcon === icon.id
+                                    ? "bg-[#77f298] text-black border-[#77f298]"
+                                    : "border-white/10 text-gray-400 hover:text-white hover:border-white/30"
+                                }`}
+                        >
+                            {/* dynamic icon renderer */}
+                            <DynamicIcon name={icon.icon_name} color="currentColor" size={24} strokeWidth={2} />
+                        </button>
+                    ))}
                 </div>
 
                 {/*Cancel/Create buttons*/}
@@ -240,4 +222,3 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate, creatorId }
     );
 }
 
-export { ICONS };
