@@ -62,3 +62,10 @@ export async function getParentRoomByLinkId(id) {
   if (error) throw error
   return data
 }
+
+// get all top-level links in a room (not inside a folder)
+export async function getLinksByRoomId(room_id) {
+  const { data, error } = await supabase.from('links').select('*').eq('room_id', room_id).is('parentfolder', null)
+  if (error) throw error
+  return data
+}
