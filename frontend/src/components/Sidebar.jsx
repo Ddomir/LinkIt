@@ -4,11 +4,14 @@ import { DynamicIcon } from 'lucide-react/dynamic';
 
 import { createInvite } from "../api/invites"
 
-function RoomIconByName({ name, className = "w-4 h-4" }) {
-    const icon = ICONS.find(i => i.name === name);
-    if (!icon) return null;
-    return <span className={className}>{icon.svg}</span>;
+function RoomIcon({ icon, className = "w-4 h-4" }) {
+    const iconObj = typeof icon === 'number'
+        ? ICONS.find(i => i.id === icon)
+        : ICONS.find(i => i.name === icon);
+    if (!iconObj) return null;
+    return <span className={className}>{iconObj.svg}</span>;
 }
+
 
 
 export default function Sidebar({rooms, createRoomsDB, callback}) {
