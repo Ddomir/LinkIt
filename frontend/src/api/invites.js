@@ -27,7 +27,7 @@ function generateRandomString() {
 async function inviteCodeExists(content) {
   const { data, error } = await supabase.from('invites').select('*').eq('link', content)
   if (error) throw error
-  return (data.length != 0)
+  return (data.length != 0) // data == 0 means it was not found
 }
 
 export async function createInvite(room_id) {
@@ -35,12 +35,14 @@ export async function createInvite(room_id) {
 
   // figure out of that string already exists as an invite code
   console.log(await inviteCodeExists(content))
-  // while (inviteCodeExists(content)) { // if it exists
-  //   content = generateRandomString() // generate a new one
-  // }
+  if (await inviteCodeExists(content)) { // if it exists
+    console.log(content + " is already an invite code!");
+    content = generateRandomString() // generate a new one
+  }
 
   const { data, error } = await supabase.from('invites').insert({ room_id: room_id, link: content }).select().single()
   if (error) throw error
+  console.log("Invite code created successfully for room " + room_id);
   return data
 }
 
