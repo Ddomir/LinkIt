@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt}) {
+export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, parentfolder, createdAt}) {
     const hex = color ? (`#${String(color).replace('#', '')}`) : '#87F6B7';
 
     return (
@@ -21,7 +21,7 @@ export default function LinkCard({ id, type, title, link, roomid, color, icon, p
 
                 {/* Display link section */}
                 <div className="text-sm opacity-90 w-full overflow-hidden whitespace-nowrap truncate" title={link ?? ''}>
-                    <span>{link}</span>
+                    <span>{link[0]}</span>
                 </div>
             </div>
     );

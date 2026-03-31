@@ -3,6 +3,9 @@ import { supabase } from '../supabaseClient'
 export async function getLinks() {
   const { data, error } = await supabase.from('links').select('*')
   if (error) throw error
+
+  console.log("Got link data.. Data:", data);
+  
   return data
 }
 
