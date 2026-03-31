@@ -63,7 +63,6 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
         const fetchIcons = async () => { 
             try {
                 const response = await getAllIcons();
-                console.log(response[0].icon_name)
                 setIcons(response);
             } 
             catch (error) {
@@ -102,7 +101,12 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
                     placeholder="e.g. ACM WebDev Room"
                     autoFocus
                     className="w-full rounded-lg bg-[#0C0A0A] border border-white/10 text-white placeholder-gray-500 px-3 py-2 text-sm outline-none focus:border-[#77f298]/60 transition-colors"
-                    onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
+                    onKeyDown={(e) => { 
+                        if (e.key === "Enter") 
+                            handleCreate(); 
+                        if (e.key === "Escape")
+                            onClose()
+                        }}
                 />
 
                 <label className="block text-sm text-gray-400 mt-5 mb-2">Symbol</label>

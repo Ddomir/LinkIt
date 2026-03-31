@@ -15,6 +15,7 @@ export async function getAllIcons() {
     const { data, error } = await supabase
     .from('icons')
     .select('*')
+    .order('id', { ascending: true })
 
     //Catches errors
     if(error){
