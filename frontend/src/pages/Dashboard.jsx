@@ -23,6 +23,7 @@ const REVERSE_ICON_MAP = {
 export default function Dashboard({session ,callback}) {
   const [rooms, setRooms] = useState([])
   const [selectedRoomId, setSelectedRoomId] = useState(null)
+  const [joinError, setJoinError] = useState(null)
 
   // Add a ref to track if we've already synced this specific user ID
   const hasSynced = useRef(false);
@@ -103,12 +104,24 @@ export default function Dashboard({session ,callback}) {
       return;
     }
     const { user } = session;
+    setJoinError(null);
     
     try {
       const newRoom = await joinRoom(user.id, code);
+      
+      if (newRoom.err) {
+        console.error("Failed to join room: see error message");
+        // todo handle displaying
+        if (newRoom.err == -1) { // -1 = code DNE
+          setJoinError("The invite code <" + code + "> does not exist!");
+        }
 
-      if (newRoom == -1)
-        console.error("Failed to join room:", err);
+        else if (newRoom.err = -2) { // -2 = user already in room
+          setJoinError("You are already in the room!");
+        }
+        
+        return;
+      }
 
       console.log("User joined room ", newRoom, " successfully");
 
@@ -122,15 +135,22 @@ export default function Dashboard({session ,callback}) {
       setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
       //setRooms((prevRooms) => [...prevRooms, newRoom]);
     } catch (err) {
-      console.error("Failed to join room:", err);
+      console.error("Failed to join room: see error message", err);
     }
   }
 
   return (
     <>
       <div className="w-screen h-screen flex">
+        { joinError &&
+          <div className='bg-[#1a1a1a] rounded-2xl p-4 w-full max-w-sm shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]
+            z-1000 absolute right-0 bottom-0 text-[#ff0000] text-xl font-bold tracking-wide px-8 m-4'>
+            <p>Error! {joinError}</p>
+          </div>
+        }
+        
         <div className="flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} />
         </div>
         <div className="flex-1 min-h-0 h-full">
           <Room roomId={selectedRoomId} />

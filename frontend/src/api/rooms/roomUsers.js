@@ -24,16 +24,33 @@ export async function createRoomUser(user_id, room_id, role){
     return data
 }
 
-// returns room_id
+async function userInRoom(user_id, room_id) {
+    const { data, error } = await supabase
+        .from('room_users')
+        .select('*')
+        .eq('UID', user_id)
+        .eq('room_id', room_id)
+
+    if (error) throw error
+
+    return (data.length != 0); 
+}
+
+// returns room data
 export async function joinRoom(user_id, code) {
     // check if room code exists
     const room = await inviteCodeExists(code);
-    if (room.room_id == -1) { // -1 is DNE
+    if (room.length == 0) { // [] is DNE
         console.error("Invite code ", code, " does not exist!");
-        return -1;
+        return {err: -1};
+    }
+    // check if user already in room
+    if (await userInRoom(user_id, room.id)) {
+        console.error("User already in room ", room);
+        return {err: -2};
     }
 
-    // if so, join the room as a VIEWER (id: 8)
+    // if all checks pass, join the room as a VIEWER (id: 8)
     createRoomUser(user_id, room.id, 8);
     return room;
 }

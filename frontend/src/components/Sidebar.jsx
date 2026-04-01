@@ -12,12 +12,13 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback}) {
     const [showPopup, setShowPopup] = useState(false)
 
     const handleCreateRoom = ({ name, icon }) => {
         createRoomsDB(name, icon);
         setShowPopup(false);
+        popupCallback(null);
     }
 
     return (
@@ -87,7 +88,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
 
             <CreateRoomPopup
                 isOpen={showPopup}
-                onClose={() => setShowPopup(false)}
+                onClose={() => {setShowPopup(false); popupCallback(null)}}
                 onCreate={handleCreateRoom}
                 onJoin={joinRoomDB}
             />
