@@ -60,7 +60,7 @@ const TEMP_ICONS = [
 ];
 
 
-export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
+export default function CreateRoomPopup({ isOpen, onClose, onCreate, onJoin }) {
     const [ICONS, setIcons] = useState([]);
     const [roomName, setRoomName] = useState("");
     const [selectedIcon, setSelectedIcon] = useState(1);
@@ -90,10 +90,19 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate }) {
         setSelectedIcon(1);
     };
 
-    const handleJoin = () => {//does nothing for now, implement in the future
+    const handleJoin = () => {
         //close popup and reset room code input (temp)
-        onClose();
-        setRoomCode("");
+        console.log(roomCode);
+        const success = onJoin(roomCode);
+        
+        // close if success
+        if (success) {
+            // todo: add popup success
+            onClose();
+        }
+        else {
+            // todo: display error
+        }
     };
 
     return (

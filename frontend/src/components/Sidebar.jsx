@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import CreateRoomPopup from "./CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
 
-import { createInvite } from "../api/invites"
 
 function RoomIcon({ icon, className = "w-4 h-4" }) {
     const iconObj = typeof icon === 'number'
@@ -13,7 +12,7 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB}) {
     const [showPopup, setShowPopup] = useState(false)
 
     const handleCreateRoom = ({ name, icon }) => {
@@ -90,6 +89,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                 isOpen={showPopup}
                 onClose={() => setShowPopup(false)}
                 onCreate={handleCreateRoom}
+                onJoin={joinRoomDB}
             />
         </div>
     )

@@ -1,7 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
-import { createRoomUser } from '../api/rooms/roomUsers'
+import { createRoomUser, joinRoom } from '../api/rooms/roomUsers'
 import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef} from 'react'
@@ -97,11 +97,40 @@ export default function Dashboard({session ,callback}) {
     }
   }
 
+  async function joinRoomDB(code) {
+    if (!session?.user) {
+      console.error("No active session found.");
+      return;
+    }
+    const { user } = session;
+    
+    try {
+      const newRoom = await joinRoom(user.id, code);
+
+      if (newRoom == -1)
+        console.error("Failed to join room:", err);
+
+      console.log("User joined room ", newRoom, " successfully");
+
+      //UI update
+      const formattedNewRoom = {
+        id: newRoom.id,
+        name: newRoom.name,
+        icon: REVERSE_ICON_MAP[newRoom.icon] || 'x'
+      };
+
+      setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
+      //setRooms((prevRooms) => [...prevRooms, newRoom]);
+    } catch (err) {
+      console.error("Failed to join room:", err);
+    }
+  }
+
   return (
     <>
       <div className="w-screen h-screen flex">
         <div className="flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} />
         </div>
         <div className="flex-1 min-h-0 h-full">
           <Room roomId={selectedRoomId} />
