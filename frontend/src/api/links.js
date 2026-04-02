@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient'
+import { supabase } from '../supabaseClient';
 
 export async function getLinks() {
   const { data, error } = await supabase.from('links').select('*')

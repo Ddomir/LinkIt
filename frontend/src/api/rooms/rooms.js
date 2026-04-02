@@ -22,9 +22,9 @@ export async function getRoomById(id) {
 */
 export async function fetchRooms(UUID) {
   const { data, error } = await supabase
-    .from('rooms')
-    .select('*')
-    .eq('creator_ID', UUID)
+    .from('room_users')
+    .select('rooms!inner (*)')
+    .eq('UID', UUID)
 
     //Catches errors
     if(error){
@@ -47,7 +47,7 @@ export async function fetchRooms(UUID) {
         iconId      The id of the user in the public.icon table. Defaults to "null"
 */
 export async function createRoom(user_id, room_name = "Untitled Room", isPrivate = false, iconId = null){
-    console.log("Attempting to insert:", user_id);
+    console.log("Attempting to insert: ", user_id, " creating room ", room_name);
 
     const { data, error } = await supabase
         .from('rooms')
