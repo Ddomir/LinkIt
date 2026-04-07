@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient'
+import { supabase } from '../supabaseClient';
 
 export async function getLinks() {
   const { data, error } = await supabase.from('links').select('*')
@@ -49,6 +49,13 @@ export async function getParentFolderByLinkId(id) {
 // get parent room id
 export async function getParentRoomByLinkId(id) {
   const { data, error } = await supabase.from('links').select('room_id').eq('id', id).single()
+  if (error) throw error
+  return data
+}
+
+// get all top-level links in a room (not inside a folder)
+export async function getLinksByRoomId(room_id) {
+  const { data, error } = await supabase.from('links').select('*').eq('room_id', room_id).is('parentfolder', null)
   if (error) throw error
   return data
 }

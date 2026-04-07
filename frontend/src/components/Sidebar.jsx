@@ -1,33 +1,24 @@
 import React, { useState } from "react";
-import CreateRoomPopup, { ICONS } from "./CreateRoomPopup";
+import CreateRoomPopup from "./CreateRoomPopup";
+import { DynamicIcon } from 'lucide-react/dynamic';
 
-function RoomIconByName({ name, className = "w-4 h-4" }) {
-    const icon = ICONS.find(i => i.name === name);
-    if (!icon) return null;
-    return <span className={className}>{icon.svg}</span>;
+
+function RoomIcon({ icon, className = "w-4 h-4" }) {
+    const iconObj = typeof icon === 'number'
+        ? ICONS.find(i => i.id === icon)
+        : ICONS.find(i => i.name === icon);
+    if (!iconObj) return null;
+    return <span className={className}>{iconObj.svg}</span>;
 }
 
-export default function Sidebar({rooms, createRoomsDB, callback}) {
-    //const [rooms, setRooms] = useState([])
-    const [selectedRoomId, setSelectedRoomId] = useState(null)
+
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback}) {
     const [showPopup, setShowPopup] = useState(false)
-    const ICON_MAP = {
-        link: 1,
-        code: 2,
-        wifi: 3,
-        star: 4,
-        bolt: 5,
-        book: 6,
-        heart: 7,
-        music: 8,
-        image: 9,
-        video: 20,
-        globe: 24
-    };
 
     const handleCreateRoom = ({ name, icon }) => {
-        createRoomsDB(name, ICON_MAP[icon]);
-        setShowPopup(false)
+        createRoomsDB(name, icon);
+        setShowPopup(false);
+        popupCallback(null);
     }
 
     return (
@@ -56,11 +47,12 @@ export default function Sidebar({rooms, createRoomsDB, callback}) {
                     {rooms.map(room => (
                         <button
                             key={room.id}
-                            onClick={() => setSelectedRoomId(room.id)}
+                            onClick={() => onSelectRoom(room.id)}
                             className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
                                 ${selectedRoomId === room.id ? 'bg-[#77f298] text-black': 'hover:bg-[#77f298]/15 hover:text-white'}`}
                         >
-                            <RoomIconByName name={room.icon} className="w-4 h-4 shrink-0 [&>svg]:w-4 [&>svg]:h-4" />
+                            <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
+
                             <span className="truncate">{room.name}</span>
                         </button>
                     ))}
@@ -96,8 +88,9 @@ export default function Sidebar({rooms, createRoomsDB, callback}) {
 
             <CreateRoomPopup
                 isOpen={showPopup}
-                onClose={() => setShowPopup(false)}
+                onClose={() => {setShowPopup(false); popupCallback(null)}}
                 onCreate={handleCreateRoom}
+                onJoin={joinRoomDB}
             />
         </div>
     )

@@ -1,6 +1,8 @@
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
+import { createRoomUser, joinRoom } from '../api/rooms/roomUsers'
+import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef, createContext} from 'react'
 import { getColors } from '../api/colors'
@@ -22,6 +24,8 @@ const REVERSE_ICON_MAP = {
 
 export default function Dashboard({session ,callback}) {
   const [rooms, setRooms] = useState([])
+  const [selectedRoomId, setSelectedRoomId] = useState(null)
+  const [joinError, setJoinError] = useState(null)
   const [COLOR_OPTIONS, setColorOptions] = useState([])
   const [selectedRoomId, setSelectedRoomId] = useState(null)
 
@@ -50,11 +54,14 @@ export default function Dashboard({session ,callback}) {
 
       try {
         const data = await fetchRooms(user.id);
-        const formattedRooms = data.map(room => ({
-          id: room.id,
-          name: room.name,
-          icon: REVERSE_ICON_MAP[room.icon] || 'star' // Convert 5 -> 'link'
-        }));
+        const formattedRooms = [];
+        data.map( (arr) => {
+          formattedRooms.push({
+            id: arr.rooms.id, 
+            name: arr.rooms.name,
+            icon: REVERSE_ICON_MAP[arr.rooms.icon] || 'x' 
+          });
+        });
 
         setRooms(formattedRooms);
       } catch (err) {
@@ -88,7 +95,10 @@ export default function Dashboard({session ,callback}) {
     
     try {
       const newRoom = await createRoom(user.id, room_name, private_status, iconId);
-      console.log("Room created succsessfully");
+      console.log("Room created successfully");
+
+      await createInvite(newRoom.id);
+      await createRoomUser(user.id, newRoom.id, 10); // 10 is the role id for owner!
 
       //UI update
       const formattedNewRoom = {
@@ -104,11 +114,59 @@ export default function Dashboard({session ,callback}) {
     }
   }
 
+  async function joinRoomDB(code) {
+    if (!session?.user) {
+      console.error("No active session found.");
+      return;
+    }
+    const { user } = session;
+    setJoinError(null);
+    
+    try {
+      const newRoom = await joinRoom(user.id, code);
+      
+      if (newRoom.err) {
+        console.error("Failed to join room: see error message");
+        // todo handle displaying
+        if (newRoom.err == -1) { // -1 = code DNE
+          setJoinError("The invite code <" + code + "> does not exist!");
+        }
+
+        else if (newRoom.err = -2) { // -2 = user already in room
+          setJoinError("You are already in the room!");
+        }
+        
+        return;
+      }
+
+      console.log("User joined room ", newRoom, " successfully");
+
+      //UI update
+      const formattedNewRoom = {
+        id: newRoom.id,
+        name: newRoom.name,
+        icon: REVERSE_ICON_MAP[newRoom.icon] || 'x'
+      };
+
+      setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
+      //setRooms((prevRooms) => [...prevRooms, newRoom]);
+    } catch (err) {
+      console.error("Failed to join room: see error message", err);
+    }
+  }
+
   return (
     <>
       <div className="w-screen h-screen flex">
+        { joinError &&
+          <div className='bg-[#1a1a1a] rounded-2xl p-4 w-full max-w-sm shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]
+            z-1000 absolute right-0 bottom-0 text-[#ff0000] text-xl font-bold tracking-wide px-8 m-4'>
+            <p>Error! {joinError}</p>
+          </div>
+        }
+        
         <div className="flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} />
         </div>
         <div className="flex-1 min-h-0 h-full">
           <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
