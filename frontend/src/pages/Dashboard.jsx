@@ -27,7 +27,6 @@ export default function Dashboard({session ,callback}) {
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [joinError, setJoinError] = useState(null)
   const [COLOR_OPTIONS, setColorOptions] = useState([])
-  const [selectedRoomId, setSelectedRoomId] = useState(null)
 
 
   // Add a ref to track if we've already synced this specific user ID
