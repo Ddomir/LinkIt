@@ -10,68 +10,68 @@ function Search() {
 
     return (
         <>
-        <div className="flex gap-2 p-3 text-base items-center">       
+        <div className="flex gap-2 p-3 text-base items-center">
 
             {/* text input for searching for cards/folders */}
-            <div className="relative flex-1"> 
-            <input 
-                type="text" 
-                placeholder="Search for cards and folders..." 
-                className="w-full h-10 px-3 pr-10 bg-[#0C0A0A] text-white border border-[D9D9D9] rounded-full" 
-            />
-            <img src={searchLogo} alt="search icon" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+            <div className="relative w-full sm:w-1/2"> 
+                <input 
+                    type="text" 
+                    placeholder="Search for cards and folders..." 
+                    className="w-full h-10 px-3 pr-10 bg-[#0C0A0A] text-white border border-[D9D9D9] rounded-full" 
+                />
+                <img src={searchLogo} alt="search icon" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 sm:w-4 sm:h-4" />
             </div>
 
-            <div className="relative"> {/*relative positioning for the sort button and its dropdown*/}
-                {/*sort button*/}
-                <button 
-                    onClick = {() => setShowSort(!showSort)} // Toggle sort options visibility on click
-                    className="flex items-center gap-2 px-6 py-2 bg-[#0C0A0A] text-white rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
-                    <img src={sortLogo} alt="sort icon" className="flex w-4 h-4" />
-                    Sort
-                </button>
+            {/* Buttons grouped to the right of the search bar */}
+            <div className="flex items-center gap-2">
+                <div className="relative">
+                    <button 
+                        onClick={() => setShowSort(!showSort)}
+                        className="flex items-center gap-2 px-3 py-2 bg-[#0C0A0A] text-white rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
+                        <img src={sortLogo} alt="sort icon" className="w-6 h-6 min-w-[14px] min-h-[14px]" />
+                        <span className="hidden sm:inline">Sort</span>
+                    </button>
 
-                {/* sort options dropdown */}
-                {showSort && (
-                    <div className="absolute mt-2 bg-[#0C0A0A] text-gray-300 font-semibold border border-[D9D9D9] rounded-lg p-3">
-                        <label className="block">                        {/*Label connects the text to the input, and block makes it so each option is on a new line*/}
-                            <input type="radio" name="sort" /> A-Z
-                        </label>
-                        <label className="block">
-                            <input type="radio" name="sort" /> Z-A
-                        </label>
-                        <label className="block">
-                            <input type="radio" name="sort" /> Newest
-                        </label>
-                        <label className="block">
-                            <input type="radio" name="sort" /> Oldest
-                        </label>
-                    </div>
-                )}
-            </div>
-            <div className="relative">
-                {/*filter button*/}
-                <button 
-                    onClick = {() => setShowFilter(!showFilter)} // Toggle filter options visibility on click
-                    className="flex items-center gap-2 px-6 py-2 bg-[#0C0A0A] text-white rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
-                    <img src={filterLogo} alt="filter icon" className="flex w-4 h-4" />
-                    Filter
-                </button>
+                    {showSort && (
+                        <div className="absolute mt-2 right-0 bg-[#0C0A0A] text-gray-300 font-semibold border border-[D9D9D9] rounded-lg p-3">
+                            <label className="block">
+                                <input type="radio" name="sort" /> A-Z
+                            </label>
+                            <label className="block">
+                                <input type="radio" name="sort" /> Z-A
+                            </label>
+                            <label className="block">
+                                <input type="radio" name="sort" /> Newest
+                            </label>
+                            <label className="block">
+                                <input type="radio" name="sort" /> Oldest
+                            </label>
+                        </div>
+                    )}
+                </div>
 
-                {/* filter options dropdown */}
-                {showFilter && (
-                    <div className="absolute mt-2 bg-[#0C0A0A] text-gray-300 font-semibold border border-[D9D9D9] rounded-lg p-3">
-                        <label className="block">  
-                            <input type="checkbox" /> Folders
-                        </label>
-                        <label className="block">
-                            <input type="checkbox" /> Links
-                        </label>
-                        <label className="block">
-                            <input type="checkbox" /> Pinned 
-                        </label>
-                    </div>
-                )}
+                <div className="relative">
+                    <button 
+                        onClick={() => setShowFilter(!showFilter)}
+                        className="flex items-center gap-2 px-3 py-2 bg-[#0C0A0A] text-white rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
+                        <img src={filterLogo} alt="filter icon" className="w-6 h-6 min-w-[14px] min-h-[14px]" />
+                        <span className="hidden sm:inline">Filter</span>
+                    </button>
+
+                    {showFilter && (
+                        <div className="absolute mt-2 right-0 bg-[#0C0A0A] text-gray-300 font-semibold border border-[D9D9D9] rounded-lg p-3">
+                            <label className="block">  
+                                <input type="checkbox" /> Folders
+                            </label>
+                            <label className="block">
+                                <input type="checkbox" /> Links
+                            </label>
+                            <label className="block">
+                                <input type="checkbox" /> Pinned 
+                            </label>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
         </>

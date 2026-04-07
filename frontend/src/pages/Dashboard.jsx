@@ -149,7 +149,7 @@ export default function Dashboard({session ,callback}) {
           </div>
         }
         
-        <div className="flex-none h-full">
+        <div className="hidden lg:block lg:flex-none h-full">
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} />
         </div>
         <div className="flex-1 min-h-0 h-full">
