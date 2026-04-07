@@ -126,7 +126,7 @@ export default function Room({ roomId }) {
 
   return (
     <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
-      <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} />
+      <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} roomID={roomId}/>
       <div className="w-1/2">
         <Search />
       </div>

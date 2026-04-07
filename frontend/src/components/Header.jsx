@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import CreateLinkPopup from "./CreateLinkPopup";
 import ShareInvite from "./ShareInvite";
 
-export default function Header({ roomData, inviteData, onAddCard }) {
+export default function Header({ roomData, inviteData, onAddCard , roomId}) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false)
 
@@ -53,6 +53,7 @@ export default function Header({ roomData, inviteData, onAddCard }) {
                 isOpen={showLinkPopup}
                 onClose={() => setShowLinkPopup(false)}
                 onCreate={handleCreateLink}
+                roomID={roomId}
             />
 
             <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />

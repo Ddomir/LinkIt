@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-
+import { createFolder } from "../api/folders.js" 
 const COLOR_OPTIONS = [
     "#87F6B7",
     "#ACDDEC",
     "#ECACEC",
 ];
 
-export default function CreateLinkPopup({ isOpen, onClose, onCreate }) {
+export default function CreateLinkPopup({ isOpen, onClose, onCreate, roomId }) {
     const [type, setType] = useState(""); //folder or link (value used when creating)
     const [openSection, setOpenSection] = useState(""); //controls for which form is open
     const [title, setTitle] = useState("");
@@ -33,7 +33,12 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate }) {
 
     const handleSubmit = async () => {
         if (!title.trim() || !type) return;
-        onCreate({ type, title, link, color });
+        // onCreate({ type, title, link, color });
+
+        if (openSection == "folder") {
+            createFolder(title, color, null, roomId);
+        } 
+
         resetAll();
         onClose();
     };
