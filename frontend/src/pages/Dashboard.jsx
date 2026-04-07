@@ -2,7 +2,9 @@ import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
 import { createUser } from '../api/users/users'
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect, useRef, createContext} from 'react'
+import { getColors } from '../api/colors'
+
 
 const REVERSE_ICON_MAP = {
   1: "link",
@@ -20,6 +22,9 @@ const REVERSE_ICON_MAP = {
 
 export default function Dashboard({session ,callback}) {
   const [rooms, setRooms] = useState([])
+  const [COLOR_OPTIONS, setColorOptions] = useState([])
+  const [selectedRoomId, setSelectedRoomId] = useState(null)
+
 
   // Add a ref to track if we've already synced this specific user ID
   const hasSynced = useRef(false);
@@ -57,9 +62,20 @@ export default function Dashboard({session ,callback}) {
       }
     }
 
+    const fetchColors = async () =>{
+      try {
+        const data = await getColors();
+        const colors = data.map(item => item.right_hex)
+        setColorOptions(colors);
+      } catch (err) {
+        console.error("Fetch failed:", err);
+      }
+    }
+
     //Triggering the functions
     syncUserToDatabase();
     fetchRoomData();
+    fetchColors();
 
   },[session])
 
@@ -95,7 +111,7 @@ export default function Dashboard({session ,callback}) {
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} />
         </div>
         <div className="flex-1 min-h-0 h-full">
-          <Room />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
         </div>
       </div>
     </>
