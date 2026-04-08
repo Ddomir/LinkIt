@@ -11,6 +11,7 @@ export default function MainContent({ roomData }) {
                     if (link.type === "folder") {
                         return (
                             <FolderCard
+                                key={link.id}
                                 id={link.id}
                                 type={link.type}
                                 title={link.title}
@@ -21,24 +22,26 @@ export default function MainContent({ roomData }) {
                                 parentfolder={link.parentfolder}
                                 createdAt={link.createdAt}
                                 links={link.links}
+                                />
+                            )
+                        }
+                        else {
+                            console.log(link);
+                            return (
+                                <LinkCard
+                                key={link.id}
+                                id={link.id}
+                                type={link.type}
+                                title={link.title}
+                                link={link.link}
+                                roomid={link.id}
+                                color={link.color}
+                                icon={link.icon}
+                                pinned={link.isPinned}
+                                folderid={link.folderid}
+                                createdAt={link.createdAt}
                             />
                         )
-                    }
-                    else{
-                    return (
-                        <LinkCard
-                            id={link.id}
-                            type={link.type}
-                            title={link.title}
-                            link={link.link}
-                            roomid={link.id}
-                            color={link.color}
-                            icon={link.icon}
-                            pinned={link.isPinned}
-                            folderid={link.folderid}
-                            createdAt={link.createdAt}
-                        />
-                    )
                     }
                 })}
             </div>

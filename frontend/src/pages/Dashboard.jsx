@@ -6,23 +6,25 @@ import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef, createContext} from 'react'
 import { getColors } from '../api/colors'
+import { getAllIcons } from '../api/icons/icons'
 
 
-const REVERSE_ICON_MAP = {
-  1: "link",
-  2: "code",
-  3: "wifi",
-  4: "star",
-  5: "bolt",
-  6: "book",
-  7: "heart",
-  8: "music",
-  9: "image",
-  20: "video",
-  24: "globe"
-};
+// const REVERSE_ICON_MAP = {
+//   1: "link",
+//   2: "code",
+//   3: "wifi",
+//   4: "star",
+//   5: "bolt",
+//   6: "book",
+//   7: "heart",
+//   8: "music",
+//   9: "image",
+//   20: "video",
+//   24: "globe"
+// };
 
 export default function Dashboard({session ,callback}) {
+  const [REVERSE_ICON_MAP, setIcons] = useState([]);
   const [rooms, setRooms] = useState([])
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [joinError, setJoinError] = useState(null)
@@ -33,6 +35,22 @@ export default function Dashboard({session ,callback}) {
   const hasSynced = useRef(false);
 
   useEffect(()=>{    
+    const fetchIcons = async () => {  // TODO: this is delayed idk why
+        try {
+            const response = await getAllIcons();
+            var all_icons = {};
+            response.forEach ( (icon) => {
+              all_icons[icon.id] = icon.icon_name;
+            });
+            // console.log(response.map( item => ({[item.id]: item.icon_name}) ) );
+            // console.log(all_icons);
+            setIcons(all_icons);
+        } 
+        catch (error) {
+            console.error("Error fetching icons:", error);
+        }
+    };
+  
     const syncUserToDatabase = async () => {
       // 1. Safety check: make sure the session and user actually exist
       if (!session?.user || hasSynced.current) return;
@@ -54,7 +72,7 @@ export default function Dashboard({session ,callback}) {
       try {
         const data = await fetchRooms(user.id);
         const formattedRooms = [];
-        data.map( (arr) => {
+        data.map( (arr) => {        
           formattedRooms.push({
             id: arr.rooms.id, 
             name: arr.rooms.name,
@@ -71,14 +89,14 @@ export default function Dashboard({session ,callback}) {
     const fetchColors = async () =>{
       try {
         const data = await getColors();
-        const colors = data.map(item => item.right_hex)
-        setColorOptions(colors);
+        setColorOptions(data);
       } catch (err) {
         console.error("Fetch failed:", err);
       }
     }
 
     //Triggering the functions
+    fetchIcons(); 
     syncUserToDatabase();
     fetchRoomData();
     fetchColors();
