@@ -150,8 +150,7 @@ export default function Dashboard({session ,callback}) {
           </div>
         }
         
-        {/* Desktop sidebar retains previous behavior on md+ screens */}
-        <div className="flex-none h-full hidden md:block">
+        <div className="hidden lg:block lg:flex-none h-full">
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} />
         </div>
 
