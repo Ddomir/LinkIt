@@ -3,11 +3,13 @@ import React, { useState, useEffect, useRef } from "react";
 
 
 export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIONS }) {
+    const default_color = {id: 0, left_hex: "#d1d5db", right_hex: "#d1d5db", name: "default_gray"}
+    
     const [type, setType] = useState(""); //folder or link (value used when creating)
     const [openSection, setOpenSection] = useState(""); //controls for which form is open
     const [title, setTitle] = useState("");
     const [link, setLink] = useState(""); //only for links
-    const [color, setColor] = useState("#FFD700");
+    const [color, setColor] = useState(default_color);
 
     const [visible, setVisible] = useState(false);
     const contentRef = useRef(null);
@@ -24,7 +26,7 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
         setType("");
         setTitle("");
         setLink("");
-        setColor("#FFD700");
+        setColor(default_color);
     };
 
     const handleSubmit = async () => {
@@ -47,6 +49,17 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
         }
     };
 
+    const TW_COLORS = {
+        "#d1d5db": "bg-[#d1d5db]", // default gray
+        "#FF0000": "bg-[#FF0000]", // red
+        "#FF6600": "bg-[#FF6600]", // orange
+        "#FFD700": "bg-[#FFD700]", // yellow
+        "#65DCB5": "bg-[#65DCB5]", // green
+        "#1E90FF": "bg-[#1E90FF]", // blue
+        "#4B0082": "bg-[#4B0082]", // dark purple
+        "#8B00FF": "bg-[#8B00FF]", // violet
+    }
+
     if (!isOpen) return null;
 
     return (
@@ -68,11 +81,11 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                     {/* Link Section */}
                     <button
                         onClick={() => toggleSection("link")}
-                        className={`w-full flex items-center justify-between bg-gray-300/80 text-black px-4 py-2 ${openSection === "link" ? "rounded-t-lg" : "rounded-lg"}`}
+                        className={`w-full flex items-center justify-between ${TW_COLORS[color.right_hex]} text-black px-4 py-2 ${openSection === "link" ? "rounded-t-lg" : "rounded-lg"}`}
                     >
                         <div className="flex items-center gap-2">
                             <span className="text-xl font-bold">Insert Link</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" className="bi bi-link-45deg" viewBox="0 0 16 16">
                                 <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
                                 <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
                             </svg>
@@ -114,7 +127,7 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                                         className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
                                         aria-expanded={showPalette}
                                     >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-palette" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-palette" viewBox="0 0 16 16">
                                                 <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
                                                 <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7"/>
                                             </svg>
@@ -127,12 +140,12 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                                         <div className="w-[10rem] overflow-x-auto flex gap-2 p-2">
                                             {COLOR_OPTIONS.map((c) => (
                                                 <button
-                                                    key={c}
+                                                    key={`${c.id}-link`}
                                                     type="button"
                                                     onClick={() => setColor(c)}
-                                                    className={`w-6 h-6 shrink-0 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
-                                                    style={{ background: c }}
-                                                    aria-label={`Choose color ${c}`}
+                                                    className={`w-6 h-6 shrink-0 rounded-full border ${color === c.right_hex ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
+                                                    style={{ background: c.right_hex }}
+                                                    aria-label={`Choose color ${c.right_hex}`}
                                                 />
                                             ))}
                                         </div>
@@ -149,11 +162,11 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                     {/* Folder Section */}
                     <button
                         onClick={() => toggleSection("folder")}
-                        className={`w-full flex items-center justify-between bg-gray-300/80 text-black px-4 py-2 mt-5 ${openSection === "folder" ? "rounded-t-lg" : "rounded-lg"}`}
+                        className={`w-full flex items-center justify-between ${TW_COLORS[color.right_hex]} text-black px-4 py-2 mt-5 ${openSection === "folder" ? "rounded-t-lg" : "rounded-lg"}`}
                     >
                         <div className="flex items-center gap-2">   
                             <span className="text-xl font-bold">New Folder</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-folder2" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" className="bi bi-folder2" viewBox="0 0 16 16">
                                 <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5zM2.5 3a.5.5 0 0 0-.5.5V6h12v-.5a.5.5 0 0 0-.5-.5H9c-.964 0-1.71-.629-2.174-1.154C6.374 3.334 5.82 3 5.264 3zM14 7H2v5.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5z"/>
                             </svg>
                         </div>
@@ -184,7 +197,7 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                                         className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
                                         aria-expanded={showPalette}
                                     >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-palette" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-palette" viewBox="0 0 16 16">
                                                 <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
                                                 <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7"/>
                                             </svg>
@@ -196,9 +209,9 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                                         <div className="w-[10rem] overflow-x-auto flex gap-2 p-2">
                                             {COLOR_OPTIONS.map((c) => (
                                                 <button
-                                                    key={c}
+                                                    key={`${c.id}-folder`}
                                                     type="button"
-                                                    onClick={() => setColor(c)}
+                                                    onClick={() => setColor( c.replace("#", "") )}
                                                     className={`w-6 h-6 shrink-0 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
                                                     style={{ background: c }}
                                                     aria-label={`Choose color ${c}`}

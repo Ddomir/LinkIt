@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import MainContent from "./MainContent";
 import Header from "./Header";
-import { getLinksByRoomId } from "../api/links";
-import { getFoldersByRoomId } from "../api/folders";
+import { createLink, getLinksByRoomId } from "../api/links";
+import { createFolder, getFoldersByRoomId } from "../api/folders";
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
 export default function Room({ roomId , COLOR_OPTIONS}) {
-  const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -32,7 +31,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
             title: l.title,
             link: l.links?.[0] ?? "",
             roomid: l.room_id,
-            color: l.color,
+            color: COLOR_OPTIONS[l.color],
             icon: l.icon,
             isPinned: l.pinned ?? false,
             folderid: l.parentfolder,
@@ -46,7 +45,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
             type: "folder",
             title: f.title,
             links: [],
-            color: f.color,
+            color: COLOR_OPTIONS[f.color],
             icon: f.icon,
             isPinned: f.pinned ?? false,
             parentfolder: f.folder_id,
@@ -76,18 +75,19 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
     fetchRoomContent();
   }, [roomId]);
 
-  const addCardToRoom = (data) => {
+  const addCardToRoom = async (data) => {
     setRoomData((prev) => {
       const links = prev.links || {};
       const maxId = Object.keys(links).length ? Math.max(...Object.keys(links).map((k) => Number(k))) : 0;
       const newId = maxId + 1;
-      const newLink = {
+
+      var new_obj = {
         id: newId,
         type: data.type || "link",
         title: data.title || "Untitled",
         link: data.link || "",
         roomid: roomId ?? 0,
-        color: data.color ? data.color.replace("#", "") : "87F6B7",
+        color: data.color ? data.color.id : "#d1d5db",
         icon: data.icon || "link",
         isPinned: false,
         folderid: null,
@@ -96,11 +96,21 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
         createdAt: new Date().toISOString(),
       };
 
+      if (data.type == "link")
+      {
+        createLink(new_obj.title, new_obj.link, new_obj.isPinned, new_obj.color, roomId, new_obj.folderid);
+      }
+      
+      else if (data.type == "folder")
+      {
+        createFolder(new_obj.name, new_obj.color, new_obj.icon, roomId, new_obj.folderid, new_obj.isPinned);
+      }
+
       return {
         ...prev,
         links: {
           ...links,
-          [newId]: newLink,
+          [newId]: new_obj,
         },
       };
     });
