@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CreateRoomPopup from "./CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
 
@@ -12,8 +12,9 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose}) {
     const [showPopup, setShowPopup] = useState(false)
+    const [visible, setVisible] = useState(Boolean(isOpen)) // Local state to control if the sidebar is mounted at all, for animation purposes
 
     const handleCreateRoom = ({ name, icon }) => {
         createRoomsDB(name, icon);
@@ -21,7 +22,17 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
         popupCallback(null);
     }
 
-    return (
+    //Escape key closes overlay when in mobile overlay mode
+    useEffect(() => { 
+        if (typeof isOpen !== 'boolean') return 
+        if (!isOpen) return 
+        const onKey = (e) => { if (e.key === 'Escape') onClose && onClose() } 
+        document.addEventListener('keydown', onKey) 
+        return () => document.removeEventListener('keydown', onKey) 
+    }, [isOpen, onClose])
+
+    // Keep the exact existing sidebar markup here as 'content' 
+    const content = (
         <div className="flex flex-col bg-[#0C0A0A] text-white h-full max-w-67">
 
             {/* Sidebar Header */}
@@ -94,4 +105,37 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
             />
         </div>
     )
+
+    //If parent passes isOpen prop, render sidebar as overlay for mobile
+    //Otherwise, render normal sidebar for desktop
+    //keep overlay mounted during close so animation can run
+    useEffect(() => {
+        if (typeof isOpen !== 'boolean') return
+        if (isOpen) {
+            setVisible(true)
+            return
+        }
+
+        const id = setTimeout(() => setVisible(false), 700)
+        return () => clearTimeout(id)
+    }, [isOpen])
+
+    if (typeof isOpen === 'boolean') {
+        if (!visible) return null
+
+        return (
+            <div className="fixed inset-0 z-40 md:hidden">
+                {/* Backdrop: click to close; animate opacity */}
+                <div
+                    className={`absolute inset-0 bg-black transition-opacity duration-700 ease-in-out ${isOpen ? 'opacity-50' : 'opacity-0'}`}
+                    onClick={onClose}
+                />
+                {/* Sliding panel: GPU-accelerated transform, will-change hint, longer duration + custom easing */}
+                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-[transform] transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                    {content}
+                </div>
+            </div>
+        )
+    }
+    return content
 }
