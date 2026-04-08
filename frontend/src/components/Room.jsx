@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import MainContent from "./MainContent";
-import ShareInvite from "./ShareInvite";
-import Search from "./Search";
 import Header from "./Header";
 import { getLinksByRoomId } from "../api/links";
 import { getFoldersByRoomId } from "../api/folders";
@@ -131,7 +129,6 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
         <Search />
       </div>
       <MainContent roomData={roomData} />
-      <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
     </div>
   );
 }

@@ -27,7 +27,7 @@ export default function Dashboard({session ,callback}) {
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [joinError, setJoinError] = useState(null)
   const [COLOR_OPTIONS, setColorOptions] = useState([])
-
+  const [mobileOpen, setMobileOpen] = useState(false) // State to track if the sidebar is open on mobile
 
   // Add a ref to track if we've already synced this specific user ID
   const hasSynced = useRef(false);
@@ -164,9 +164,26 @@ export default function Dashboard({session ,callback}) {
           </div>
         }
         
-        <div className="flex-none h-full">
+        <div className="hidden lg:block lg:flex-none h-full">
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} />
         </div>
+
+        {/* Mobile hamburger + overlay sidebar - only visible on smaller screens */}
+        <div className="md:hidden"> 
+          <button
+            className ="m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2"
+            aria-label="Open menu"
+            onClick={() => setMobileOpen(true)} 
+          >
+            {/* simple hamburger icon */} 
+            <svg xmlns="http://www.w3.org/2000/svg" className ="w-6 h-6" fill="none" viewBox=" 0 0 24 24" strokeWidth={2} stroke="currentColor"> 
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+        </div>
+        
         <div className="flex-1 min-h-0 h-full">
           <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
         </div>
