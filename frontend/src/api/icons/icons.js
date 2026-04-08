@@ -6,7 +6,28 @@ import { supabase } from '../../supabaseClient'
 // IF THIS MESSAGE HAS NOT BEEN DELETED, BRING THIS TO THE ATTENTION OF
 // ANDRES
 
+// type shit
+// dominic
+
 //GETTERS
+
+export async function getAllIcons() {
+    const { data, error } = await supabase
+    .from('icons')
+    .select('*')
+    .order('id', { ascending: true })
+
+    //Catches errors
+    if(error){
+        console.error("❌ Get data Failed:", error.message);
+        throw error;
+    }else{
+        console.log("✅ Get icons data Success! Data:", data);
+    }
+    //Returns the data
+    return data
+}
+
 /**
     Get the icon corresponding to a specified id
     Parameters:
