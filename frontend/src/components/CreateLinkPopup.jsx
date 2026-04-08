@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 
 
-export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIONS }) {
+export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIONS, ICONS_OPTIONS }) {
     const default_color = {id: 0, left_hex: "#d1d5db", right_hex: "#d1d5db", name: "default_gray"}
     
     const [type, setType] = useState(""); //folder or link (value used when creating)
@@ -211,10 +211,10 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                                                 <button
                                                     key={`${c.id}-folder`}
                                                     type="button"
-                                                    onClick={() => setColor( c.replace("#", "") )}
-                                                    className={`w-6 h-6 shrink-0 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
-                                                    style={{ background: c }}
-                                                    aria-label={`Choose color ${c}`}
+                                                    onClick={() => setColor(c)}
+                                                    className={`w-6 h-6 shrink-0 rounded-full border ${color === c.right_hex ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
+                                                    style={{ background: c.right_hex }}
+                                                    aria-label={`Choose color ${c.right_hex}`}
                                                 />
                                             ))}
                                         </div>

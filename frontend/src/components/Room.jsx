@@ -27,9 +27,9 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
         links.forEach((l) => {
           linksMap[l.id] = {
             id: l.id,
-            type: l.type,
+            type: "link",
             title: l.title,
-            link: l.links?.[0] ?? "",
+            link: l.links || "",
             roomid: l.room_id,
             color: COLOR_OPTIONS[l.color],
             icon: l.icon,
@@ -76,8 +76,8 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
   }, [roomId]);
 
   const addCardToRoom = async (data) => {
-    setRoomData((prev) => {
-      const links = prev.links || {};
+      const prev = roomData;
+      const links = roomData.links || {};
       const maxId = Object.keys(links).length ? Math.max(...Object.keys(links).map((k) => Number(k))) : 0;
       const newId = maxId + 1;
 
@@ -88,7 +88,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
         link: data.link || "",
         roomid: roomId ?? 0,
         color: data.color ? data.color.id : "#d1d5db",
-        icon: data.icon || "link",
+        icon: data.type === "link" ? "link" : "book",
         isPinned: false,
         folderid: null,
         parentfolder: data.parentfolder ?? null,
@@ -103,17 +103,11 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
       
       else if (data.type == "folder")
       {
-        createFolder(new_obj.name, new_obj.color, new_obj.icon, roomId, new_obj.folderid, new_obj.isPinned);
+        createFolder(new_obj.name, new_obj.color, 0, roomId, new_obj.folderid, new_obj.isPinned);
       }
 
-      return {
-        ...prev,
-        links: {
-          ...links,
-          [newId]: new_obj,
-        },
-      };
-    });
+      prev[newId] = new_obj;
+      setRoomData(prev); // TODO: this does not rerender the component idk why
   };
 
   if (!roomId) {

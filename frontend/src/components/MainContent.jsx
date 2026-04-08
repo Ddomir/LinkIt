@@ -26,7 +26,6 @@ export default function MainContent({ roomData }) {
                             )
                         }
                         else {
-                            console.log(link);
                             return (
                                 <LinkCard
                                 key={link.id}
