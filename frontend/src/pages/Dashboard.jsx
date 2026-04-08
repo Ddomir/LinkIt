@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
@@ -169,7 +168,7 @@ export default function Dashboard({session ,callback}) {
             </svg>
           </button>
 
-          <Sidebar isOpen={mobileOpen} onClose={() => setMobileOpen(false)} callback={callback} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
         </div>
         
         <div className="flex-1 min-h-0 h-full">
