@@ -3,7 +3,7 @@ import CreateLinkPopup from "./CreateLinkPopup";
 import ShareInvite from "./ShareInvite";
 import Search from "./Search";
 
-export default function Header({ roomData, inviteData, onAddCard }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false)
 
@@ -78,6 +78,7 @@ export default function Header({ roomData, inviteData, onAddCard }) {
             </div>
 
             <CreateLinkPopup
+                COLOR_OPTIONS={COLOR_OPTIONS}
                 isOpen={showLinkPopup}
                 onClose={() => setShowLinkPopup(false)}
                 onCreate={handleCreateLink}

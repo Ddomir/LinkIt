@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const COLOR_OPTIONS = [
-    "#87F6B7",
-    "#ACDDEC",
-    "#ECACEC",
-];
 
-export default function CreateLinkPopup({ isOpen, onClose, onCreate }) {
+
+export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIONS }) {
     const [type, setType] = useState(""); //folder or link (value used when creating)
     const [openSection, setOpenSection] = useState(""); //controls for which form is open
     const [title, setTitle] = useState("");
     const [link, setLink] = useState(""); //only for links
-    const [color, setColor] = useState("#87F6B7");
+    const [color, setColor] = useState("#FFD700");
 
     const [visible, setVisible] = useState(false);
     const contentRef = useRef(null);
@@ -28,7 +24,7 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate }) {
         setType("");
         setTitle("");
         setLink("");
-        setColor("#87F6B7");
+        setColor("#FFD700");
     };
 
     const handleSubmit = async () => {
@@ -126,16 +122,20 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate }) {
                                     </button>
 
                                     <div className={`flex gap-2 items-center transition-all duration-150 ${showPalette ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0 overflow-hidden'}`}>
-                                        {COLOR_OPTIONS.map((c) => (
-                                            <button
-                                                key={c}
-                                                type="button"
-                                                onClick={() => setColor(c)}
-                                                className={`w-6 h-6 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
-                                                style={{ background: c }}
-                                                aria-label={`Choose color ${c}`}
-                                            />
-                                        ))}
+                                        {/* Color display */}
+                                        {/* Fix this soon somehow */}
+                                        <div className="w-[10rem] overflow-x-auto flex gap-2 p-2">
+                                            {COLOR_OPTIONS.map((c) => (
+                                                <button
+                                                    key={c}
+                                                    type="button"
+                                                    onClick={() => setColor(c)}
+                                                    className={`w-6 h-6 shrink-0 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
+                                                    style={{ background: c }}
+                                                    aria-label={`Choose color ${c}`}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -192,16 +192,19 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate }) {
                                     </button>
 
                                     <div className={`flex gap-2 items-center transition-all duration-150 ${showPalette ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0 overflow-hidden'}`}>
-                                        {COLOR_OPTIONS.map((c) => (
-                                            <button
-                                                key={c}
-                                                type="button"
-                                                onClick={() => setColor(c)}
-                                                className={`w-6 h-6 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
-                                                style={{ background: c }}
-                                                aria-label={`Choose color ${c}`}
-                                            />
-                                        ))}
+                                        {/* Color display */}
+                                        <div className="w-[10rem] overflow-x-auto flex gap-2 p-2">
+                                            {COLOR_OPTIONS.map((c) => (
+                                                <button
+                                                    key={c}
+                                                    type="button"
+                                                    onClick={() => setColor(c)}
+                                                    className={`w-6 h-6 shrink-0 rounded-full border ${color === c ? 'ring-2 ring-offset-1 ring-gray-400' : 'border-white/20'}`}
+                                                    style={{ background: c }}
+                                                    aria-label={`Choose color ${c}`}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 

@@ -4,7 +4,9 @@ import { createRoom, fetchRooms } from '../api/rooms/rooms'
 import { createRoomUser, joinRoom } from '../api/rooms/roomUsers'
 import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect, useRef, createContext} from 'react'
+import { getColors } from '../api/colors'
+
 
 const REVERSE_ICON_MAP = {
   1: "link",
@@ -24,6 +26,7 @@ export default function Dashboard({session ,callback}) {
   const [rooms, setRooms] = useState([])
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [joinError, setJoinError] = useState(null)
+  const [COLOR_OPTIONS, setColorOptions] = useState([])
   const [mobileOpen, setMobileOpen] = useState(false) // State to track if the sidebar is open on mobile
 
   // Add a ref to track if we've already synced this specific user ID
@@ -65,9 +68,20 @@ export default function Dashboard({session ,callback}) {
       }
     }
 
+    const fetchColors = async () =>{
+      try {
+        const data = await getColors();
+        const colors = data.map(item => item.right_hex)
+        setColorOptions(colors);
+      } catch (err) {
+        console.error("Fetch failed:", err);
+      }
+    }
+
     //Triggering the functions
     syncUserToDatabase();
     fetchRoomData();
+    fetchColors();
 
   },[session])
 
@@ -171,7 +185,7 @@ export default function Dashboard({session ,callback}) {
         </div>
         
         <div className="flex-1 min-h-0 h-full">
-          <Room roomId={selectedRoomId} />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
         </div>
       </div>
     </>

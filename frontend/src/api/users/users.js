@@ -72,17 +72,6 @@ export async function getUser(UUID) {
     return data
 }
 
-//     //Catches errors
-//     if(error){
-//         console.error("❌ Get data Failed:", error.message);
-//         throw error;
-//     }else{
-//         console.log("✅ Get data Success! Data:", data);
-//     }
-//     //Returns the data
-//     return data
-// }
-
 export async function createUser(userId, userName, userEmail){
     const { data, error } = await supabase
         .from('users')
@@ -93,17 +82,8 @@ export async function createUser(userId, userName, userEmail){
         })
         .select()
         .single()
-    
-//     //Catches errors
-//     if(error){
-//         console.error("❌ Insert Failed:", error.message);
-//         throw error;
-//     }else{
-//         console.log("✅ Insert Success! Data:", data);
-//     }
-//     return data
 }
-
+    
 /**
  *  Update the username base on id
  *  Parameters:
@@ -128,36 +108,3 @@ export async function updateUsername(id, userName){
     return data
 }
 
-//     //Catches errors
-//     if(error){
-//         console.error("❌ Update Failed:", error.message);
-//         throw error;
-//     }else{
-//         console.log("✅ Update Success! Data:", data);
-//     }
-//     return data
-// }
-
-// /**
-//  *  Update the email base on id
-//  *  Parameters:
-//  *     id          icon id
-//  *     newEmail    The new Email
-//  */
-// export async function updateEmail(id, newEmail){
-//   const { data, error } = await supabase
-//     .from('users')
-//     .update({ email: newEmail })
-//     .eq('id', id)
-//     .select()           //Gets the entire updated row sent back
-//     .single()           //Only send that row back
-
-//     //Catches errors
-//     if(error){
-//         console.error("❌ Update Failed:", error.message);
-//         throw error;
-//     }else{
-//         console.log("✅ Update Success! Data:", data);
-//     }
-//     return data
-// }
