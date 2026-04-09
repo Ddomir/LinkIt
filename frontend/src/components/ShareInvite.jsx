@@ -7,7 +7,7 @@ export default function ShareInvite({ isOpen, onClose, inviteData }) {
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
             <div
-                className="bg-[#1a1a1a] rounded-2xl p-6 w-full max-w-sm shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]"
+                className="bg-[#1a1a1a] rounded-2xl p-6 w-full max-w-md shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-white text-lg font-bold mb-5">Share Room Invite Code</h2>

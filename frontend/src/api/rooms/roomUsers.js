@@ -54,3 +54,21 @@ export async function joinRoom(user_id, code) {
     createRoomUser(user_id, room.id, 8);
     return room;
 }
+
+// returns room data
+export async function removeRoomUser(user_id, room_id) {
+    // check user already in room
+    if (await userInRoom(user_id, room_id)) {
+        // checks that owner is not the one being removed
+        if (await supabase.from('room_users').delete().match({ UID: user_id, room_id: room_id, role: 10 }))
+            console.error("❌ Cannot remove owner of the room!")
+
+        const { error } = await supabase.from('room_users').delete().match({ UID: user_id, room_id: room_id });
+        console.log("User successfully removed from room.");
+        
+        if (error) throw error
+        return;
+    }
+
+    console.error("User ", user_id, " not in room: ", room_id);
+}
