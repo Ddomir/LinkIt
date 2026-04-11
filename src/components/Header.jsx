@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Share2, Plus, SquareArrowRightExit } from "lucide-react";
-import CreateLinkPopup from "./CreateLinkPopup";
-import ShareInvite from "./ShareInvite";
+import CreateLinkPopup from "./popups/CreateLinkPopup";
+import ShareInvite from "./popups/ShareInvite";
+import LeaveRoomPopup from "./popups/LeaveRoomPopup";
 import Search from "./Search";
 
 export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS }) {
@@ -15,7 +16,6 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
         }
         setShowLinkPopup(false);
     };
-
     
 
     return (
@@ -92,6 +92,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
 
             <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
         
+            <LeaveRoomPopup isOpen={showLeavePopup} onClose={() => setLeavePopup(false)} LeaveCallback={{}} />
             
         </div>
     )

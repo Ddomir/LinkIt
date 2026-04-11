@@ -7,6 +7,7 @@ import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef, createContext} from 'react'
 import { getColors } from '../api/colors'
 import { getAllIcons } from '../api/icons/icons'
+import { removeRoomUser } from "../api/rooms/roomUsers";
 
 
 // const REVERSE_ICON_MAP = {
