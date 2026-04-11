@@ -2,10 +2,12 @@ import React from 'react';
 
 export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt}) {
     return (
-            <div
+            <a
                 className="rounded-xl p-3 sm:w-56 h-30 shadow-sm flex flex-col justify-between cursor-pointer transition-transform hover:scale-[1.02]"
                 style={{ background: `linear-gradient(to right, ${color.left_hex}, ${color.right_hex})` }}
                 title={title}
+                href={link}
+                target="_blank"
             >
                 {/* Icon and card title section */}
                 <div className="flex items-start justify-between">
@@ -21,6 +23,6 @@ export default function LinkCard({ id, type, title, link, roomid, color, icon, p
                 <div className="text-sm opacity-90 w-full overflow-hidden whitespace-nowrap truncate" title={link ?? ''}>
                     <span>{link}</span>
                 </div>
-            </div>
+            </a>
     );
 }
