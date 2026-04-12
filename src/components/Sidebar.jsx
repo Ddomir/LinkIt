@@ -22,6 +22,12 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
         popupCallback(null);
     }
 
+    const handleJoinRoom = (code) => {
+        joinRoomDB(code);
+        setShowPopup(false);
+        popupCallback(null);
+    }
+
     //Escape key closes overlay when in mobile overlay mode
     useEffect(() => { 
         if (typeof isOpen !== 'boolean') return 
@@ -101,7 +107,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                 isOpen={showPopup}
                 onClose={() => {setShowPopup(false); popupCallback(null)}}
                 onCreate={handleCreateRoom}
-                onJoin={joinRoomDB}
+                onJoin={handleJoinRoom}
             />
         </div>
     )

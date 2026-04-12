@@ -9,7 +9,6 @@ import { getColors } from '../api/colors'
 import { getAllIcons } from '../api/icons/icons'
 import { removeRoomUser } from "../api/rooms/roomUsers";
 
-
 // const REVERSE_ICON_MAP = {
 //   1: "link",
 //   2: "code",
@@ -172,6 +171,25 @@ export default function Dashboard({session ,callback}) {
       console.error("Failed to join room: see error message", err);
     }
   }
+  
+  async function LeaveRoomDB(room_id) {
+    if (!session?.user) {
+      console.error("No active session found.");
+      return;
+    }
+    const { user } = session;
+    setJoinError(null);
+    
+    try {
+      await removeRoomUser(user.id, room_id);
+      
+      
+      //UI update
+      window.location.reload();
+    } catch (err) {
+      console.error("Failed to leave room: see error message", err);
+    }
+  }
 
   return (
     <>
@@ -204,7 +222,7 @@ export default function Dashboard({session ,callback}) {
         </div>
         
         <div className="flex-1 min-h-0 h-full">
-          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} leaveRoomDB={LeaveRoomDB}/>
         </div>
       </div>
     </>

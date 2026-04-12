@@ -5,7 +5,7 @@ import ShareInvite from "./popups/ShareInvite";
 import LeaveRoomPopup from "./popups/LeaveRoomPopup";
 import Search from "./Search";
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, leaveRoomDB }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false)
     const [showLeavePopup, setLeavePopup] = useState(false)
@@ -16,7 +16,6 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
         }
         setShowLinkPopup(false);
     };
-    
 
     return (
         <div className="flex flex-col justify-between px-3 py-3 w-full">
@@ -92,7 +91,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
 
             <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
         
-            <LeaveRoomPopup isOpen={showLeavePopup} onClose={() => setLeavePopup(false)} LeaveCallback={{}} />
+            <LeaveRoomPopup isOpen={showLeavePopup} onClose={() => setLeavePopup(false)} LeaveCallback={leaveRoomDB} />
             
         </div>
     )

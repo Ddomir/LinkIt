@@ -6,7 +6,7 @@ import { createFolder, getFoldersByRoomId } from "../api/folders";
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId , COLOR_OPTIONS}) {
+export default function Room({ roomId , COLOR_OPTIONS, leaveRoomDB}) {
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -75,6 +75,12 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
     fetchRoomContent();
   }, [roomId]);
 
+  
+  const handleLeave = async () => {
+      console.log("ATTEMPTING TO LEAVE ", roomId);
+      leaveRoomDB(roomId);
+  };
+
   const addCardToRoom = async (data) => {
       const prev = roomData;
       const links = roomData.links || {};
@@ -128,7 +134,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
 
   return (
     <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
-      <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS} />
+      <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS} leaveRoomDB={handleLeave} />
       <div className="w-1/2">
       </div>
       <MainContent roomData={roomData} />
