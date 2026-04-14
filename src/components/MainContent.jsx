@@ -1,7 +1,7 @@
 import LinkCard from "./LinkCard"
 import FolderCard from "./FolderCard"
 
-export default function MainContent({ roomData }) {
+export default function MainContent({ roomData, colorMap }) {
     return (
         //new card props (roomData) passed in this order:
         //CreateLinkPopup --> Header --> Room --> MainContent
@@ -11,6 +11,7 @@ export default function MainContent({ roomData }) {
                     if (link.type === "folder") {
                         return (
                             <FolderCard
+                                key={id}
                                 id={link.id}
                                 type={link.type}
                                 title={link.title}
@@ -21,12 +22,14 @@ export default function MainContent({ roomData }) {
                                 parentfolder={link.parentfolder}
                                 createdAt={link.createdAt}
                                 links={link.links}
+                                colorMap={colorMap}
                             />
                         )
                     }
                     else{
                     return (
                         <LinkCard
+                            key={id}
                             id={link.id}
                             type={link.type}
                             title={link.title}
@@ -37,6 +40,7 @@ export default function MainContent({ roomData }) {
                             pinned={link.isPinned}
                             folderid={link.folderid}
                             createdAt={link.createdAt}
+                            colorMap={colorMap}
                         />
                     )
                     }

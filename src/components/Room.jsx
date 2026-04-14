@@ -127,7 +127,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
       <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS} />
       <div className="w-1/2">
       </div>
-      <MainContent roomData={roomData} />
+      <MainContent roomData={roomData} colorMap={COLOR_OPTIONS} />
     </div>
   );
 }

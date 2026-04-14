@@ -1,12 +1,12 @@
 import React from 'react';
 
-export default function FolderCard({ id, type, title, links, roomid, color, icon, pinned, parentfolder, createdAt }) {
-    const hex = color ? (`#${String(color).replace('#', '')}`) : '#87F6B7';
+export default function FolderCard({ id, type, title, links, roomid, color, icon, pinned, parentfolder, createdAt, colorMap }) {
+    const bgStyle = colorMap?.[color] ?? {};
 
     return (
             <div
                 className="rounded-xl p-3 sm:w-56 h-30 shadow-sm flex flex-col justify-between cursor-pointer transition-transform hover:scale-[1.02]"
-                style={{ backgroundColor: hex }}
+                style={bgStyle}
                 title={title}
             >
                 {/*Folder icon above title */}

@@ -1,12 +1,10 @@
-import React from 'react';
-
-export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt}) {
-    const hex = color ? (`#${String(color).replace('#', '')}`) : '#87F6B7';
+export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt, colorMap }) {
+    const bgStyle = colorMap?.[color] ?? {};
 
     return (
             <a
                 className="rounded-xl p-3 sm:w-56 h-30 shadow-sm flex flex-col justify-between cursor-pointer transition-transform hover:scale-[1.02]"
-                style={{ backgroundColor: hex }}
+                style={bgStyle}
                 title={title}
                 href={link}
                 target="_blank"

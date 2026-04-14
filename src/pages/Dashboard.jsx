@@ -1,6 +1,7 @@
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
 import { createRoom, fetchRooms } from '../api/rooms/rooms'
+import { getLinksByRoomId } from '../api/links'
 import { createRoomUser, joinRoom } from '../api/rooms/roomUsers'
 import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
@@ -47,7 +48,7 @@ export default function Dashboard({session ,callback}) {
       }
     }
 
-    const fetchRoomData = async () =>{
+    const fetchRoomList = async () =>{
       if (!session?.user) return;
       const { user } = session;
 
@@ -71,8 +72,11 @@ export default function Dashboard({session ,callback}) {
     const fetchColors = async () =>{
       try {
         const data = await getColors();
-        const colors = data.map(item => item.right_hex)
-        setColorOptions(colors);
+        const colorMap = {};
+        data.forEach(item => {
+          colorMap[item.id] = { background: `linear-gradient(to right, ${item.left_hex}, ${item.right_hex})` };
+        });
+        setColorOptions(colorMap);
       } catch (err) {
         console.error("Fetch failed:", err);
       }
@@ -80,7 +84,7 @@ export default function Dashboard({session ,callback}) {
 
     //Triggering the functions
     syncUserToDatabase();
-    fetchRoomData();
+    fetchRoomList();
     fetchColors();
 
   },[session])
