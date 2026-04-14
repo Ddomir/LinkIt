@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import MainContent from "./MainContent";
-import ShareInvite from "./ShareInvite";
-import Search from "./Search";
 import Header from "./Header";
-import { getLinksByRoomId } from "../api/links";
-import { getFoldersByRoomId } from "../api/folders";
+import { getLinksByRoomId, createLink } from "../api/links";
+import { getFoldersByRoomId, createFolder } from "../api/folders";
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId }) {
+export default function Room({ roomId , COLOR_OPTIONS}) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -32,7 +30,7 @@ export default function Room({ roomId }) {
             id: l.id,
             type: l.type,
             title: l.title,
-            link: l.links?.[0] ?? "",
+            link: l.links ?? "",
             roomid: l.room_id,
             color: l.color,
             icon: l.icon,
@@ -78,34 +76,47 @@ export default function Room({ roomId }) {
     fetchRoomContent();
   }, [roomId]);
 
-  const addCardToRoom = (data) => {
-    setRoomData((prev) => {
-      const links = prev.links || {};
-      const maxId = Object.keys(links).length ? Math.max(...Object.keys(links).map((k) => Number(k))) : 0;
-      const newId = maxId + 1;
-      const newLink = {
-        id: newId,
-        type: data.type || "link",
-        title: data.title || "Untitled",
-        link: data.link || "",
-        roomid: roomId ?? 0,
-        color: data.color ? data.color.replace("#", "") : "87F6B7",
-        icon: data.icon || "link",
-        isPinned: false,
-        folderid: null,
-        parentfolder: data.parentfolder ?? null,
-        links: data.type === "folder" ? [] : undefined,
-        createdAt: new Date().toISOString(),
-      };
-
-      return {
-        ...prev,
-        links: {
-          ...links,
-          [newId]: newLink,
-        },
-      };
-    });
+  const addCardToRoom = async (data) => {
+    try {
+      if (data.type === "folder") {
+        const row = await createFolder(data.title || "Untitled", data.color ?? null, null, roomId);
+        const newFolder = {
+          id: row.id,
+          type: "folder",
+          title: row.title,
+          color: row.color,
+          icon: row.icon || null,
+          isPinned: row.pinned ?? false,
+          parentfolder: row.folder_id ?? null,
+          links: [],
+          createdAt: row.created_at,
+        };
+        setRoomData((prev) => ({
+          ...prev,
+          links: { ...prev.links, [`f_${row.id}`]: newFolder },
+        }));
+      } else {
+        const row = await createLink(data.link || "", data.title || "Untitled", data.color ?? null, roomId, null);
+        const newLink = {
+          id: row.id,
+          type: row.type || "link",
+          title: row.title,
+          link: row.links ?? "",
+          roomid: row.room_id,
+          color: row.color,
+          icon: row.icon || "link",
+          isPinned: row.pinned ?? false,
+          folderid: row.parentfolder ?? null,
+          createdAt: row.created_at,
+        };
+        setRoomData((prev) => ({
+          ...prev,
+          links: { ...prev.links, [row.id]: newLink },
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to create card:", err);
+    }
   };
 
   if (!roomId) {
@@ -126,12 +137,14 @@ export default function Room({ roomId }) {
 
   return (
     <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
+<<<<<<< HEAD:frontend/src/components/Room.jsx
       <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} roomID={roomId}/>
+=======
+      <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS} />
+>>>>>>> 26e2aa8b9353c317c6deef8fe61192ebae3c2dcb:src/components/Room.jsx
       <div className="w-1/2">
-        <Search />
       </div>
-      <MainContent roomData={roomData} />
-      <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
+      <MainContent roomData={roomData} colorMap={COLOR_OPTIONS} />
     </div>
   );
 }
