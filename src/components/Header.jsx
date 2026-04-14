@@ -5,7 +5,7 @@ import Search from "./Search";
 
 export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
-    const [showInvitePopup, setInvitePopup] = useState(false)
+    const [showInvitePopup, setInvitePopup] = useState(false);
 
     const handleCreateLink = (data) => {
         if (onAddCard && data) {
@@ -86,6 +86,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
             />
 
             <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
+
         </div>
     )
 }

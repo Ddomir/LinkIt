@@ -36,6 +36,16 @@ async function userInRoom(user_id, room_id) {
     return (data.length != 0); 
 }
 
+export async function removeRoomUser(user_id, room_id) {
+    const { error } = await supabase
+        .from('room_users')
+        .delete()
+        .eq('UID', user_id)
+        .eq('room_id', room_id)
+
+    if (error) throw error;
+}
+
 // returns room data
 export async function joinRoom(user_id, code) {
     // check if room code exists
