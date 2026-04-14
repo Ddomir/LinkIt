@@ -3,7 +3,7 @@ import CreateLinkPopup from "./CreateLinkPopup";
 import ShareInvite from "./ShareInvite";
 import Search from "./Search";
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false);
 
@@ -49,8 +49,15 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
 
                 <div className="w-full flex items-center justify-between gap-3">
                     <div className="w-full sm:w-1/2">
-                        <Search />
-                    </div>
+                            <Search
+                                searchQuery={searchQuery}
+                                onSearchChange={setSearchQuery}
+                                filters={filters}
+                                onFilterChange={setFilters}
+                                sortOption={sortOption}
+                                onSortChange={setSortOption}
+                            />
+                        </div>
 
                 </div>
             </div>
