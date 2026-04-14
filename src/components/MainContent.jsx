@@ -5,29 +5,33 @@ export default function MainContent({ roomData, colorMap }) {
     return (
         //new card props (roomData) passed in this order:
         //CreateLinkPopup --> Header --> Room --> MainContent
-        <div className="flex-1 min-h-0 h-full p-4 overflow-auto">
-            <div className="sm:flex sm:flex-row sm:flex-wrap grid items-start grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {Object.entries(roomData?.links || {}).map(([id,link]) => {
-                    if (link.type === "folder") {
-                        return (
-                            <FolderCard
-                                key={id}
-                                id={link.id}
-                                type={link.type}
-                                title={link.title}
-                                roomid={link.id}
-                                color={link.color}
-                                icon={link.icon}
-                                pinned={link.isPinned}
-                                parentfolder={link.parentfolder}
-                                createdAt={link.createdAt}
-                                links={link.links}
-                                colorMap={colorMap}
-                            />
-                        )
-                    }
-                    else{
-                    return (
+        <div className="flex-1 min-h-0 h-full p-4 overflow-auto flex flex-col gap-3">
+            {Object.entries(roomData?.links || {})
+                .filter(([, link]) => link.type === "folder")
+                .sort(([, a], [, b]) => b.isPinned - a.isPinned)
+                .map(([id, link]) => (
+                    <FolderCard
+                        key={id}
+                        id={link.id}
+                        type={link.type}
+                        title={link.title}
+                        roomid={link.id}
+                        color={link.color}
+                        icon={link.icon}
+                        pinned={link.isPinned}
+                        parentfolder={link.parentfolder}
+                        createdAt={link.createdAt}
+                        links={link.links}
+                        colorMap={colorMap}
+                    />
+                ))
+            }
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(224px, 1fr))', gap: '0.75rem' }}>
+                {Object.entries(roomData?.links || {})
+                    .filter(([, link]) => link.type !== "folder")
+                    .sort(([, a], [, b]) => b.isPinned - a.isPinned)
+                    .map(([id, link]) => (
                         <LinkCard
                             key={id}
                             id={link.id}
@@ -42,9 +46,8 @@ export default function MainContent({ roomData, colorMap }) {
                             createdAt={link.createdAt}
                             colorMap={colorMap}
                         />
-                    )
-                    }
-                })}
+                    ))
+                }
             </div>
         </div>
     )
