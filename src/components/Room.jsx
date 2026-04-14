@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import MainContent from "./MainContent";
 import Header from "./Header";
 import { getLinksByRoomId, createLink } from "../api/links";
-import { getFoldersByRoomId } from "../api/folders";
+import { getFoldersByRoomId, createFolder } from "../api/folders";
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
@@ -78,28 +78,44 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
 
   const addCardToRoom = async (data) => {
     try {
-      const row = await createLink(data.link || "", data.title || "Untitled", data.color ?? null, roomId, null);
-
-      const newLink = {
-        id: row.id,
-        type: row.type || data.type || "link",
-        title: row.title,
-        link: row.links ?? "",
-        roomid: row.room_id,
-        color: row.color,
-        icon: row.icon || "link",
-        isPinned: row.pinned ?? false,
-        folderid: row.parentfolder ?? null,
-        links: data.type === "folder" ? [] : undefined,
-        createdAt: row.createdAt,
-      };
-
-      setRoomData((prev) => ({
-        ...prev,
-        links: { ...prev.links, [row.id]: newLink },
-      }));
+      if (data.type === "folder") {
+        const row = await createFolder(data.title || "Untitled", data.color ?? null, null, roomId);
+        const newFolder = {
+          id: row.id,
+          type: "folder",
+          title: row.title,
+          color: row.color,
+          icon: row.icon || null,
+          isPinned: row.pinned ?? false,
+          parentfolder: row.folder_id ?? null,
+          links: [],
+          createdAt: row.created_at,
+        };
+        setRoomData((prev) => ({
+          ...prev,
+          links: { ...prev.links, [`f_${row.id}`]: newFolder },
+        }));
+      } else {
+        const row = await createLink(data.link || "", data.title || "Untitled", data.color ?? null, roomId, null);
+        const newLink = {
+          id: row.id,
+          type: row.type || "link",
+          title: row.title,
+          link: row.links ?? "",
+          roomid: row.room_id,
+          color: row.color,
+          icon: row.icon || "link",
+          isPinned: row.pinned ?? false,
+          folderid: row.parentfolder ?? null,
+          createdAt: row.created_at,
+        };
+        setRoomData((prev) => ({
+          ...prev,
+          links: { ...prev.links, [row.id]: newLink },
+        }));
+      }
     } catch (err) {
-      console.error("Failed to create link:", err);
+      console.error("Failed to create card:", err);
     }
   };
 

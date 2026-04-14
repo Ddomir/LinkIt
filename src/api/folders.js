@@ -14,7 +14,7 @@ export async function getFolderById(id) {
 
 // TODO: determine whether or not nested folders are allowed
 export async function createFolder(name, color, icon, parent_room) {
-  const { data, error } = await supabase.from('folders').insert({ title: name, color: color, icon: icon, parent_room: parent_room }).select().single()
+  const { data, error } = await supabase.from('folders').insert({ title: name, color: color, icon: icon, room_id: parent_room }).select().single()
   if (error) throw error
   return data
 }
