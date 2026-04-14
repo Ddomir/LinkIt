@@ -37,11 +37,12 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
                         <button
                             onClick={() => setShowLinkPopup(true)}
                             aria-label="Add link or folder"
-                            className="hover:bg-[#77f298] hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                            className="flex items-center gap-1.5 bg-[#77f298] text-black text-sm font-semibold px-3 py-1.5 rounded-full hover:bg-[#5fd980] hover:cursor-pointer transition-colors duration-150"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5 text-black bg-gray-300 rounded-full p-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-4 h-4">
                                 <path d="M10 4a1 1 0 011 1v4h4a1 1 0 110 2h-4v4a1 1 0 11-2 0v-4H5a1 1 0 110-2h4V5a1 1 0 011-1z" />
                             </svg>
+                            <span>New</span>
                         </button>
                     </div>
                 </div>
@@ -69,9 +70,9 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS 
                 <button
                     onClick={() => setShowLinkPopup(true)}
                     aria-label="Add link or folder"
-                    className="hover:bg-[#77f298] hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                    className="flex items-center justify-center bg-[#77f298] text-black rounded-full w-10 h-10 shadow-lg hover:bg-[#5fd980] hover:cursor-pointer transition-colors duration-150"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5 text-black bg-gray-300 rounded-full p-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5">
                         <path d="M10 4a1 1 0 011 1v4h4a1 1 0 110 2h-4v4a1 1 0 11-2 0v-4H5a1 1 0 110-2h4V5a1 1 0 011-1z" />
                     </svg>
                 </button>

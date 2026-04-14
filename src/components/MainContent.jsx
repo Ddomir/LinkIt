@@ -27,7 +27,7 @@ export default function MainContent({ roomData, colorMap }) {
                 ))
             }
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(224px, 1fr))', gap: '0.75rem' }}>
+            <div className="mt-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(224px, 1fr))', gap: '0.75rem' }}>
                 {Object.entries(roomData?.links || {})
                     .filter(([, link]) => link.type !== "folder")
                     .sort(([, a], [, b]) => b.isPinned - a.isPinned)

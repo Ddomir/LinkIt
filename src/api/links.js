@@ -15,7 +15,7 @@ export async function getLinkById(id) {
 // name = link content
 // title = title of the link
 export async function createLink(name, title, color, room_id, folder_id) {
-  const { data, error } = await supabase.from('links').insert({ link_name: name, title: title, color: color, room_id: room_id, folder_id: folder_id }).select().single()
+  const { data, error } = await supabase.from('links').insert({ links: name, title: title, color: color, room_id: room_id, parentfolder: folder_id ?? null }).select().single()
   if (error) throw error
   return data
 }
