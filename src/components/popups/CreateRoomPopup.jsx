@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DynamicIcon } from 'lucide-react/dynamic';
-import { getAllIcons } from "../api/icons/icons";
+import { getAllIcons } from "../../api/icons/icons";
 
 
 export default function CreateRoomPopup({ isOpen, onClose, onCreate, onJoin }) {

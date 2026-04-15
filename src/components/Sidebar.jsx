@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CreateRoomPopup from "./CreateRoomPopup";
+import CreateRoomPopup from "./popups/CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
 
 

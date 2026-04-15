@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import CreateLinkPopup from "./CreateLinkPopup";
-import ShareInvite from "./ShareInvite";
+import CreateLinkPopup from "./popups/CreateLinkPopup";
+import ShareInvite from "./popups/ShareInvite";
 import Search from "./Search";
 
 export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption }) {
