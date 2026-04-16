@@ -2,8 +2,10 @@ import React, { useState } from 'react';                // Import React library 
 import searchLogo from '../assets/search-logo.svg'; 
 import sortLogo from '../assets/sort-logo.svg'; 
 import filterLogo from '../assets/filter-logo.svg'; 
+import { List, LayoutGrid } from "lucide-react";
 
 function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {} }) {
+    const [displayView, setView] = useState(true); // options for displaying -- true for tile, false for list
 
     const [showSort, setShowSort] = useState(false); // State to control visibility of sort options
     const [showFilter, setShowFilter] = useState(false); // State to control visibility of filter options
@@ -41,10 +43,10 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
 
     return (
         <>
-        <div className="flex gap-2 p-3 text-base items-center">
+        <div className="flex gap-2 p-3 text-base justify-between items-center">
 
             {/* text input for searching for cards/folders */}
-                <div className="relative w-full sm:w-1/2"> 
+            <div className="relative w-full sm:w-1/2"> 
                 <input 
                     type="text" 
                     placeholder="Search for cards and folders..." 
@@ -113,6 +115,28 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                         </div>
                     )}
                 </div>
+
+
+            </div>
+
+
+            {/* Buttons for the left of the screen */}
+            <div className="items-center gap-2 rounded-full">
+                <button
+                    onClick={() => {}}
+                    aria-label="Tile view"
+                    className="hover:bg-[#77f298] text-gray-300 hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                >
+                    <LayoutGrid size={28} strokeWidth={3}  />
+                </button>
+                
+                <button
+                    onClick={() => {}}
+                    aria-label="List view"
+                    className="hover:bg-[#77f298] text-gray-300 hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                >
+                    <List size={28} strokeWidth={3}  />
+                </button>
             </div>
         </div>
         </>
