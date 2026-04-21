@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import CreateLinkPopup from "./popups/CreateLinkPopup";
 import ShareInvite from "./popups/ShareInvite";
 import Search from "./Search";
-import Toggle from "./Toggle";
 
 export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
