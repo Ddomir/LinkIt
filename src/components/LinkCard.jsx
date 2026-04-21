@@ -15,15 +15,15 @@ function getFaviconUrl(link) {
     }
 }
 
-export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt, colorMap }) {
-    const bgStyle = colorMap?.[color] ?? {};
+export default function LinkCard({ id, type, title, link, roomid, color, icon, pinned, folderid, createdAt, colorMap, viewMode }) {
+    const bgStyle = colorMap?.[color] ?? {backgroundColor: 'white'};
     const [faviconError, setFaviconError] = useState(false);
     const normalizedLink = normalizeUrl(link);
     const faviconUrl = getFaviconUrl(link);
 
     return (
             <a
-                className="rounded-xl p-3 h-30 shadow-sm flex flex-col justify-between cursor-pointer transition-transform hover:scale-[1.02]"
+                className={`${viewMode ? `flex-col h-30` : `gap-3 ml-3`} rounded-xl p-3 shadow-sm flex justify-between cursor-pointer transition-transform hover:scale-[1.02]`}
                 style={bgStyle}
                 title={title}
                 href={normalizedLink}
@@ -45,14 +45,26 @@ export default function LinkCard({ id, type, title, link, roomid, color, icon, p
                         <h3 className="text-lg font-bold" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
                             {title}
                         </h3>
+
+                        {/* Display link section (list view) */}
+                        {!viewMode && (
+                            <>
+                                <span className="text-sm opacity-90">|</span>
+                                <div className="text-sm opacity-90 overflow-hidden whitespace-nowrap truncate" title={link ?? ''}>
+                                    <span>{link}</span>
+                                </div>
+                            </>
+                        )}
                     </div>
                     {pinned && <Pin size={16} className="fill-current opacity-90 shrink-0" />}
                 </div>
 
-                {/* Display link section */}
-                <div className="text-sm opacity-90 w-full overflow-hidden whitespace-nowrap truncate" title={link ?? ''}>
-                    <span>{link}</span>
-                </div>
+                {/* Display link section (tile view) */}
+                {viewMode && (
+                    <div className="text-sm opacity-90 w-full overflow-hidden whitespace-nowrap truncate" title={link ?? ''}>
+                        <span>{link}</span>
+                    </div>
+                )}
             </a>
     );
 }

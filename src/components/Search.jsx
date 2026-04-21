@@ -2,9 +2,9 @@ import React, { useState } from 'react';                // Import React library 
 import searchLogo from '../assets/search-logo.svg'; 
 import sortLogo from '../assets/sort-logo.svg'; 
 import filterLogo from '../assets/filter-logo.svg'; 
+import { List, LayoutGrid } from "lucide-react";
 
-function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {} }) {
-
+function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {}, viewMode = true, setViewMode = () => {} }) {
     const [showSort, setShowSort] = useState(false); // State to control visibility of sort options
     const [showFilter, setShowFilter] = useState(false); // State to control visibility of filter options
 
@@ -40,11 +40,10 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
     }
 
     return (
-        <>
-        <div className="flex gap-2 p-3 text-base items-center">
+        <div className="flex gap-2 p-3 text-base justify-between items-center">
 
             {/* text input for searching for cards/folders */}
-                <div className="relative w-full sm:w-1/2"> 
+            <div className="relative w-full sm:w-1/2"> 
                 <input 
                     type="text" 
                     placeholder="Search for cards and folders..." 
@@ -113,9 +112,21 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                         </div>
                     )}
                 </div>
+
+                <div className="flex">
+                    <button 
+                        onClick={() => setViewMode(!viewMode)}
+                        className={`${viewMode ? `bg-white text-[#0C0A0A]` : `bg-[#0C0A0A] text-white`} pl-3 pr-1.5 py-2  rounded-l-full border border-r-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
+                        <LayoutGrid className="size-6" />
+                    </button>
+                    <button 
+                        onClick={() => setViewMode(!viewMode)}
+                        className={`${viewMode ? `bg-[#0C0A0A] text-white` : `bg-white text-[#0C0A0A]`} pr-3 pl-1.5 py-2 rounded-r-full border border-l-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
+                        <List className="size-6" />
+                    </button>
+                </div>
             </div>
         </div>
-        </>
     );
 }
 
