@@ -1,6 +1,6 @@
 import { Folder, Pin } from 'lucide-react';
 
-export default function FolderCard({ id, type, title, links, roomid, color, icon, pinned, parentfolder, createdAt, colorMap }) {
+export default function FolderCard({ id, type, title, links, roomid, color, icon, pinned, parentfolder, createdAt, colorMap, onClick }) {
     const bgStyle = colorMap?.[color] ?? {};
 
     return (
@@ -8,6 +8,7 @@ export default function FolderCard({ id, type, title, links, roomid, color, icon
                 className="rounded-xl px-4 py-3 w-full shadow-sm flex flex-row items-center gap-3 cursor-pointer transition-transform hover:scale-[1.01]"
                 style={bgStyle}
                 title={title}
+                onClick={onClick}
             >
                 <Folder size={24} className="shrink-0" />
 

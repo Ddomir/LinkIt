@@ -1,7 +1,7 @@
 import LinkCard from "./LinkCard"
 import FolderCard from "./FolderCard"
 
-export default function MainContent({ roomData, colorMap, searchQuery = '', filters = { folders: true, links: true, pinnedOnly: false }, sortOption = 'pinned', viewMode = true }) {
+export default function MainContent({ roomData, colorMap, searchQuery = '', filters = { folders: true, links: true, pinnedOnly: false }, sortOption = 'pinned', viewMode = true, onFolderClick }) {
     const entries = Object.entries(roomData?.links || {});
 
     const q = (searchQuery || '').trim().toLowerCase();
@@ -74,6 +74,7 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
                     createdAt={link.createdAt}
                     links={link.links}
                     colorMap={colorMap}
+                    onClick={() => onFolderClick?.(link)}
                 />
             ))}
 
