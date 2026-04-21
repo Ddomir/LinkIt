@@ -14,6 +14,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({ folders: true, links: true, pinnedOnly: false });
   const [sortOption, setSortOption] = useState('pinned');
+  const [viewMode, setViewMode] = useState(true); // true for tile view, false for list view
 
   useEffect(() => {
     if (!roomId) return;
@@ -147,10 +148,12 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
         setFilters={setFilters}
         sortOption={sortOption}
         setSortOption={setSortOption}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
       <div className="w-1/2">
       </div>
-      <MainContent roomData={roomData} colorMap={COLOR_OPTIONS} searchQuery={searchQuery} filters={filters} sortOption={sortOption} />
+      <MainContent roomData={roomData} colorMap={COLOR_OPTIONS} searchQuery={searchQuery} filters={filters} sortOption={sortOption} viewMode={viewMode} />
     </div>
   );
 }

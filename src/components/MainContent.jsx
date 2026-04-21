@@ -1,7 +1,7 @@
 import LinkCard from "./LinkCard"
 import FolderCard from "./FolderCard"
 
-export default function MainContent({ roomData, colorMap, searchQuery = '', filters = { folders: true, links: true, pinnedOnly: false }, sortOption = 'pinned' }) {
+export default function MainContent({ roomData, colorMap, searchQuery = '', filters = { folders: true, links: true, pinnedOnly: false }, sortOption = 'pinned', viewMode = true }) {
     const entries = Object.entries(roomData?.links || {});
 
     const q = (searchQuery || '').trim().toLowerCase();
@@ -77,7 +77,7 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
                 />
             ))}
 
-            <div className="mt-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(224px, 1fr))', gap: '0.75rem' }}>
+            <div className={`${viewMode ? `grid gap-3 grid-cols-[repeat(auto-fill,minmax(224px,1fr))]` : `flex flex-col gap-3`} mt-4`}>
                 {filters?.links && sortedLinks.map(([id, link]) => (
                     <LinkCard
                         key={id}
@@ -92,6 +92,7 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
                         folderid={link.folderid}
                         createdAt={link.createdAt}
                         colorMap={colorMap}
+                        viewMode={viewMode}
                     />
                 ))}
             </div>

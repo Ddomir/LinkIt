@@ -4,7 +4,7 @@ import ShareInvite from "./popups/ShareInvite";
 import Search from "./Search";
 import { Share2, Plus, SquareArrowRightExit } from "lucide-react";
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false);
 
@@ -52,6 +52,8 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                                 onFilterChange={setFilters}
                                 sortOption={sortOption}
                                 onSortChange={setSortOption}
+                                viewMode={viewMode}
+                                setViewMode={setViewMode}
                             />
                         </div>
 
