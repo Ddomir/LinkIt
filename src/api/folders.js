@@ -19,8 +19,8 @@ export async function createFolder(name, color, icon, parent_room, parent_folder
 }
 
 // cannot change parent_room
-export async function updateFolder(id, name, color, icon) {
-  const { data, error } = await supabase.from('folders').update({ title: name, color: color, icon: icon }).eq('id', id).select().single()
+export async function updateFolder(id, name, color, icon, pinned) {
+  const { data, error } = await supabase.from('folders').update({ title: name, color: color, icon: icon, pinned: pinned }).eq('id', id).select().single()
   if (error) throw error
   return data
 }

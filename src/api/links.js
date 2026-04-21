@@ -21,8 +21,8 @@ export async function createLink(name, title, color, room_id, folder_id) {
 }
 
 // cannot change parent folder or room
-export async function updateLink(id, name, title, color) {
-  const { data, error } = await supabase.from('links').update({ link_name: name, title: title, color: color }).eq('id', id).select().single()
+export async function updateLink(id, name, title, color, pinned) {
+  const { data, error } = await supabase.from('links').update({ links: name, title: title, color: color, pinned: pinned }).eq('id', id).select().single()
   if (error) throw error
   return data
 }

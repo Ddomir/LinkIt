@@ -98,7 +98,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     ))}
                 </div>
 
-                <div className="flex flex-grow">
+                <div className="flex grow">
                 </div>
 
                 <button
@@ -160,7 +160,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     onClick={onClose}
                 />
                 {/* Sliding panel: GPU-accelerated transform, will-change hint, longer duration + custom easing */}
-                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-[transform] transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-transform transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                     {content}
                 </div>
             </div>
