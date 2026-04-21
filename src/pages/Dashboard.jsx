@@ -201,7 +201,7 @@ export default function Dashboard({session ,callback}) {
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
         </div>
         
-        <div className="flex-1 min-h-0 h-full">
+        <div className="flex-1 min-w-0 h-full overflow-hidden">
           <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
         </div>
       </div>

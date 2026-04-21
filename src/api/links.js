@@ -59,3 +59,17 @@ export async function getLinksByRoomId(room_id) {
   if (error) throw error
   return data
 }
+
+// get all links inside a specific folder
+export async function getLinksByFolderId(folder_id) {
+  const { data, error } = await supabase.from('links').select('*').eq('parentfolder', folder_id)
+  if (error) throw error
+  return data
+}
+
+// get parentfolder for all links in a room, used to compute folder link counts
+export async function getLinkFolderIdsByRoomId(room_id) {
+  const { data, error } = await supabase.from('links').select('id, parentfolder').eq('room_id', room_id).not('parentfolder', 'is', null)
+  if (error) throw error
+  return data
+}
