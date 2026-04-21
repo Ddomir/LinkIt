@@ -173,7 +173,7 @@ export default function Dashboard({session ,callback}) {
 
   return (
     <>
-      <div className="w-screen h-screen flex">
+      <div className="w-screen h-screen flex app-bg">
         { joinError &&
           <div className='bg-[#1a1a1a] rounded-2xl p-4 w-full max-w-sm shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]
             z-1000 absolute right-0 bottom-0 text-[#ff0000] text-xl font-bold tracking-wide px-8 m-4'>

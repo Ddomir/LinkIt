@@ -124,7 +124,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
 
   if (!roomId) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-linear-120 from-[#1E221D] to-[#0E100E]">
+      <div className="w-full h-full flex items-center justify-center app-bg">
         <p className="text-[#77f298] text-xl">Select a room to get started</p>
       </div>
     );
@@ -132,14 +132,14 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-linear-120 from-[#1E221D] to-[#0E100E]">
+      <div className="w-full h-full flex items-center justify-center app-bg">
         <p className="text-[#77f298] text-xl">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] text-5xl">
+    <div className="w-full h-full flex flex-col app-bg">
       <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
