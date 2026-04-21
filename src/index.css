@@ -44,10 +44,9 @@ body {
 .accent { background: var(--accent); color: var(--accent-foreground); }                                                             /* For buttons, links, and other interactive elements. */       
 
 .theme-toggle { /* The theme toggle button. */
-    background: transparent;
+    background: var(--surface);
     color: var(--text);
-    border: none;
-    padding: 6px;
+    border: 1px solid var(--text);
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
