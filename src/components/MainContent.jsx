@@ -99,6 +99,3 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
         </div>
     )
 }
-
-
-

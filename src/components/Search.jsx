@@ -113,7 +113,7 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                     )}
                 </div>
 
-                <div className="flex">
+                <div className="hidden sm:flex">
                     <button 
                         onClick={() => setViewMode(!viewMode)}
                         className={`${viewMode ? `bg-white text-[#0C0A0A]` : `bg-[#0C0A0A] text-white`} pl-3 pr-1.5 py-2  rounded-l-full border border-r-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
