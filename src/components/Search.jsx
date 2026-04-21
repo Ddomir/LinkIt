@@ -46,7 +46,7 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
             <div className="relative w-full sm:w-1/2"> 
                 <input 
                     type="text" 
-                    placeholder="Search for cards and folders..." 
+                    placeholder="Search for links and folders..." 
                     className="w-full h-10 px-3 pr-10 bg-[#0C0A0A] text-white border border-[D9D9D9] rounded-full" 
                     value={searchQuery}
                     onChange={handleInputChange}
