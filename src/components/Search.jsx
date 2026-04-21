@@ -4,9 +4,7 @@ import sortLogo from '../assets/sort-logo.svg';
 import filterLogo from '../assets/filter-logo.svg'; 
 import { List, LayoutGrid } from "lucide-react";
 
-function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {} }) {
-    const [displayView, setView] = useState(true); // options for displaying -- true for tile, false for list
-
+function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {}, viewMode = true, setViewMode = () => {} }) {
     const [showSort, setShowSort] = useState(false); // State to control visibility of sort options
     const [showFilter, setShowFilter] = useState(false); // State to control visibility of filter options
 
@@ -42,7 +40,6 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
     }
 
     return (
-        <>
         <div className="flex gap-2 p-3 text-base justify-between items-center">
 
             {/* text input for searching for cards/folders */}
@@ -116,30 +113,20 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                     )}
                 </div>
 
-
-            </div>
-
-
-            {/* Buttons for the left of the screen */}
-            <div className="items-center gap-2 rounded-full">
-                <button
-                    onClick={() => {}}
-                    aria-label="Tile view"
-                    className="hover:bg-[#77f298] text-gray-300 hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
-                >
-                    <LayoutGrid size={28} strokeWidth={3}  />
-                </button>
-                
-                <button
-                    onClick={() => {}}
-                    aria-label="List view"
-                    className="hover:bg-[#77f298] text-gray-300 hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
-                >
-                    <List size={28} strokeWidth={3}  />
-                </button>
+                <div className="flex">
+                    <button 
+                        onClick={() => setViewMode(!viewMode)}
+                        className={`${viewMode ? `bg-white text-[#0C0A0A]` : `bg-[#0C0A0A] text-white`} pl-3 pr-1.5 py-2  rounded-l-full border border-r-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
+                        <LayoutGrid className="size-6" />
+                    </button>
+                    <button 
+                        onClick={() => setViewMode(!viewMode)}
+                        className={`${viewMode ? `bg-[#0C0A0A] text-white` : `bg-white text-[#0C0A0A]`} pr-3 pl-1.5 py-2 rounded-r-full border border-l-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
+                        <List className="size-6" />
+                    </button>
+                </div>
             </div>
         </div>
-        </>
     );
 }
 
