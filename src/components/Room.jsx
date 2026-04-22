@@ -299,7 +299,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
 
   if (!roomId) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-linear-120 from-[#1E221D] to-[#0E100E]">
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-linear-120 from-[#1E221D] to-[#0E100E] overflow-hidden">
         <p className="text-[#77f298] text-xl">Select a room to get started</p>
         <button
           onClick={openPopup}
@@ -313,7 +313,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-linear-120 from-[#1E221D] to-[#0E100E]">
+      <div className="w-full h-full flex items-center justify-center app-bg overflow-hidden">
         <p className="text-[#77f298] text-xl">Loading...</p>
       </div>
     );

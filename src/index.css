@@ -21,3 +21,47 @@ body {
     from { opacity: 0; transform: translateY(-16px) scale(0.95); }
     to   { opacity: 1; transform: translateY(0)     scale(1);    }
 }
+
+:root { /* Light theme variables */
+    --bg: #ffffff;
+    --surface: #f1f1f1; /*sidebar */
+    --text: #000000;   /* default text (LIGHT MODE) */
+    --accent: #77f298;
+    --accent-foreground: #071410;
+    --transition: 180ms ease;
+}
+.dark { /* Dark theme variables */
+    --bg: linear-gradient(120deg, #1E221D, #0E100E);
+    --surface: #0C0A0A;
+    --text: #ffffff;   /* DARK MODE TEXT */
+    --accent: #77f298;
+    --accent-foreground: #071410;
+}
+
+/* Semantic helpers using variables - classes which can be used in the JSX to apply  appropriate colors + transitions based on the theme. */
+.app-bg {      /* The main background and text color for the app. */
+    background: var(--bg);
+    transition: background var(--transition), color var(--transition);
+}
+ 
+.surface { /* For cards, modals, and other surfaces. */
+    background: var(--surface);
+    color: var(--text);
+    transition: background var(--transition), color var(--transition);
+}
+
+.accent { /* For buttons, links, and other interactive elements. */  
+    background: var(--accent); 
+    color: var(--accent-foreground); 
+}                                                             
+.theme-toggle { /* The theme toggle button. */
+    background: var(--surface);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease, transform .12s ease;
+}
+
+.theme-toggle.is-dark { background: rgba(255,255,255,0.03); }

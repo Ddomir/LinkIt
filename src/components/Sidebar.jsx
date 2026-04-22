@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CreateRoomPopup from "./popups/CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
-
+import Toggle from "./Toggle";
 
 function RoomIcon({ icon, className = "w-4 h-4" }) {
     const iconObj = typeof icon === 'number'
@@ -28,16 +28,16 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
 
     // Keep the exact existing sidebar markup here as 'content' 
     const content = (
-        <div className="flex flex-col bg-[#0C0A0A] text-white h-full max-w-67">
+        <div className="flex flex-col surface h-full max-w-67">
 
             {/* Sidebar Header */}
             <div className="px-5 pt-4 pb-2">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-white text-xl font-bold tracking-wide">Rooms</h3>
+                    <h3 className="text-xl font-bold tracking-wide">Rooms</h3>
                     <button
                         onClick={() => openPopup()}
                         aria-label="Add room"
-                        className="hover:bg-[#77f298] hover:text-black hover:cursor-pointer rounded-full p-1 transition-colors duration-150"
+                        className="accent rounded-full p-1 hover:opacity-90 hover:cursor-pointer transition-colors duration-150"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -58,7 +58,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                             <button
                                 onClick={() => { onSelectRoom(room.id); setOpenMenuId(null); }}
                                 className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
-                                    ${selectedRoomId === room.id ? 'bg-[#77f298] text-black' : 'hover:bg-[#77f298]/15 hover:text-white'}`}
+                                    ${selectedRoomId === room.id ? 'accent text-[var(--accent-foreground)]' : 'hover:opacity-90'}`}
                             >
                                 <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
                                 <span className="truncate">{room.name}</span>
@@ -68,7 +68,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                             <button
                                 onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === room.id ? null : room.id); }}
                                 className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-opacity duration-150 cursor-pointer
-                                    ${selectedRoomId === room.id ? 'text-black hover:bg-black/10' : 'text-white hover:bg-white/10'}
+                                    ${selectedRoomId === room.id ? 'text-[var(--accent-foreground)] hover:bg-black/10' : 'hover:bg-white/10'}
                                     ${openMenuId === room.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                                 aria-label="Room options"
                             >
@@ -79,7 +79,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
 
                             {/* Dropdown menu */}
                             {openMenuId === room.id && (
-                                <div className="absolute right-0 top-full mt-1 z-50 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                                <div className="absolute right-0 top-full mt-1 z-50 surface border border-white/10 rounded-xl shadow-xl overflow-hidden">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); onLeaveRoom && onLeaveRoom(room.id); }}
                                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
@@ -96,7 +96,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                 </div>
 
                 <button
-                    className="bg-[#87F6B7] rounded-full text-[#0C0A0A] text-2xl p-2 px-8 cursor-pointer hover:scale-105 transition ease-in-out justify-self-center m-4"
+                    className="accent rounded-full text-[var(--accent-foreground)] text-2xl p-2 px-8 cursor-pointer hover:scale-105 transition ease-in-out justify-self-center m-4"
                     onClick={callback}
                     id="google-logout-btn"
                 >
@@ -106,7 +106,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
 
             {/* Bottom bar */}
             <div className="flex items-center justify-between px-5 py-4">
-
+                <Toggle />
                 <button className="hover:text-[#77f298] cursor-pointer transition-colors duration-150" aria-label="Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
                         <path fillRule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
