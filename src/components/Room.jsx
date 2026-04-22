@@ -299,7 +299,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
 
   if (!roomId) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-linear-120 from-[#1E221D] to-[#0E100E] overflow-hidden">
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 app-bg overflow-hidden">
         <p className="text-[#77f298] text-xl">Select a room to get started</p>
         <button
           onClick={openPopup}
@@ -320,7 +320,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] overflow-hidden">
+    <div className="w-full h-full flex flex-col app-bg overflow-hidden">
       <EditCardPopup
         isOpen={!!editItem}
         onClose={() => setEditItem(null)}
