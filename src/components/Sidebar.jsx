@@ -12,16 +12,10 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom, openPopup}) {
     const [showPopup, setShowPopup] = useState(false)
     const [openMenuId, setOpenMenuId] = useState(null)
     const [visible, setVisible] = useState(Boolean(isOpen)) // Local state to control if the sidebar is mounted at all, for animation purposes
-
-    const handleCreateRoom = ({ name, icon }) => {
-        createRoomsDB(name, icon);
-        setShowPopup(false);
-        popupCallback(null);
-    }
 
     //Escape key closes overlay when in mobile overlay mode
     useEffect(() => { 
@@ -41,7 +35,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                 <div className="flex items-center justify-between">
                     <h3 className="text-white text-xl font-bold tracking-wide">Rooms</h3>
                     <button
-                        onClick={() => setShowPopup(true)}
+                        onClick={() => openPopup()}
                         aria-label="Add room"
                         className="hover:bg-[#77f298] hover:text-black hover:cursor-pointer rounded-full p-1 transition-colors duration-150"
                     >
@@ -125,13 +119,6 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     </svg>
                 </button>
             </div>
-
-            <CreateRoomPopup
-                isOpen={showPopup}
-                onClose={() => {setShowPopup(false); popupCallback(null)}}
-                onCreate={handleCreateRoom}
-                onJoin={joinRoomDB}
-            />
         </div>
     )
 

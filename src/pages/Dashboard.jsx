@@ -7,6 +7,7 @@ import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef, createContext} from 'react'
 import { getColors } from '../api/colors'
+import CreateRoomPopup from '../components/CreateRoomPopup'
 import { removeRoomUser } from "../api/rooms/roomUsers";
 
 
@@ -30,6 +31,7 @@ export default function Dashboard({session ,callback}) {
   const [joinError, setJoinError] = useState(null)
   const [COLOR_OPTIONS, setColorOptions] = useState([])
   const [mobileOpen, setMobileOpen] = useState(false) // State to track if the sidebar is open on mobile
+  const [showRoomPopup, setShowRoomPopup] = useState(false)
 
   // Add a ref to track if we've already synced this specific user ID
   const hasSynced = useRef(false);
@@ -180,9 +182,16 @@ export default function Dashboard({session ,callback}) {
             <p>Error! {joinError}</p>
           </div>
         }
+
+        <CreateRoomPopup
+          isOpen={showRoomPopup}
+          onClose={() => { setShowRoomPopup(false); setJoinError(null); }}
+          onCreate={({ name, icon }) => { createRoomsDB(name, icon); setShowRoomPopup(false); }}
+          onJoin={joinRoomDB}
+        />
         
         <div className="hidden lg:block lg:flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} openPopup={() => setShowRoomPopup(true)} />
         </div>
 
         {/* Mobile hamburger + overlay sidebar - only visible on smaller screens */}
@@ -190,7 +199,7 @@ export default function Dashboard({session ,callback}) {
           <button
             className ="m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2"
             aria-label="Open menu"
-            onClick={() => setMobileOpen(true)}
+            onClick={() => setMobileOpen(prev => !prev)}
           >
             {/* simple hamburger icon */}
             <svg xmlns="http://www.w3.org/2000/svg" className ="w-6 h-6" fill="none" viewBox=" 0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -198,11 +207,11 @@ export default function Dashboard({session ,callback}) {
             </svg>
           </button>
 
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} />
         </div>
         
         <div className="flex-1 min-w-0 h-full overflow-hidden">
-          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} />
         </div>
       </div>
     </>

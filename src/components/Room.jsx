@@ -7,7 +7,7 @@ import { getFoldersByRoomId, getSubfoldersByFolderId, createFolder, updateFolder
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId , COLOR_OPTIONS}) {
+export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -299,8 +299,14 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
 
   if (!roomId) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-linear-120 from-[#1E221D] to-[#0E100E]">
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-linear-120 from-[#1E221D] to-[#0E100E]">
         <p className="text-[#77f298] text-xl">Select a room to get started</p>
+        <button
+          onClick={openPopup}
+          className="px-6 py-2 rounded-full bg-[#77f298] text-black font-semibold hover:bg-[#5ee07e] transition-colors duration-150 cursor-pointer"
+        >
+          Join or Create a Room
+        </button>
       </div>
     );
   }
