@@ -186,7 +186,7 @@ export default function Dashboard({session ,callback}) {
           <button
             className ="m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2"
             aria-label="Open menu"
-            onClick={() => setMobileOpen(true)}//(prev => !prev)
+            onClick={() => setMobileOpen(prev => !prev)}
           >
             {/* simple hamburger icon */} 
             <svg xmlns="http://www.w3.org/2000/svg" className ="w-6 h-6" fill="none" viewBox=" 0 0 24 24" strokeWidth={2} stroke="currentColor"> 
@@ -198,7 +198,7 @@ export default function Dashboard({session ,callback}) {
         </div>
         
         <div className="flex-1 min-h-0 h-full">
-          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} />
         </div>
       </div>
     </>
