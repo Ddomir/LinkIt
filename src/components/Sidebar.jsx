@@ -12,16 +12,10 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom, openPopup}) {
     const [showPopup, setShowPopup] = useState(false)
     const [openMenuId, setOpenMenuId] = useState(null)
     const [visible, setVisible] = useState(Boolean(isOpen)) // Local state to control if the sidebar is mounted at all, for animation purposes
-
-    const handleCreateRoom = ({ name, icon }) => {
-        createRoomsDB(name, icon);
-        setShowPopup(false);
-        popupCallback(null);
-    }
 
     //Escape key closes overlay when in mobile overlay mode
     useEffect(() => { 
@@ -41,7 +35,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                 <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold tracking-wide">Rooms</h3>
                     <button
-                        onClick={() => setShowPopup(true)}
+                        onClick={() => openPopup()}
                         aria-label="Add room"
                         className="accent rounded-full p-1 hover:opacity-90 hover:cursor-pointer transition-colors duration-150"
                     >
@@ -98,7 +92,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     ))}
                 </div>
 
-                <div className="flex flex-grow">
+                <div className="flex grow">
                 </div>
 
                 <button
@@ -125,13 +119,6 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     </svg>
                 </button>
             </div>
-
-            <CreateRoomPopup
-                isOpen={showPopup}
-                onClose={() => {setShowPopup(false); popupCallback(null)}}
-                onCreate={handleCreateRoom}
-                onJoin={joinRoomDB}
-            />
         </div>
     )
 
@@ -160,7 +147,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     onClick={onClose}
                 />
                 {/* Sliding panel: GPU-accelerated transform, will-change hint, longer duration + custom easing */}
-                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-[transform] transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-transform transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                     {content}
                 </div>
             </div>

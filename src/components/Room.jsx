@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import MainContent from "./MainContent";
 import Header from "./Header";
-import { getLinksByRoomId, getLinksByFolderId, getLinkFolderIdsByRoomId, createLink } from "../api/links";
-import { getFoldersByRoomId, getSubfoldersByFolderId, createFolder } from "../api/folders";
+import EditCardPopup from "./popups/EditCardPopup";
+import { getLinksByRoomId, getLinksByFolderId, getLinkFolderIdsByRoomId, createLink, updateLink, removeLink } from "../api/links";
+import { getFoldersByRoomId, getSubfoldersByFolderId, createFolder, updateFolder, removeFolder } from "../api/folders";
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId , COLOR_OPTIONS}) {
+export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -17,6 +18,7 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
   const [viewMode, setViewMode] = useState(true); // true for tile view, false for list view
   const [selectedFolder, setSelectedFolder] = useState(null); // { id, title } when inside a folder
   const [folderData, setFolderData] = useState(null); // roomData-shaped object for folder contents
+  const [editItem, setEditItem] = useState(null); // item being edited
 
   const openFolder = async (folder) => {
     try {
@@ -209,10 +211,102 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
     }
   };
 
+  const deleteCard = async (id, type) => {
+    try {
+      if (type === "folder") {
+        await removeFolder(id);
+        const key = `f_${id}`;
+        if (selectedFolder) {
+          setFolderData((prev) => {
+            const next = { ...prev.links };
+            delete next[key];
+            return { ...prev, links: next };
+          });
+        }
+        setRoomData((prev) => {
+          const next = { ...prev.links };
+          delete next[key];
+          return { ...prev, links: next };
+        });
+      } else {
+        await removeLink(id);
+        if (selectedFolder) {
+          setFolderData((prev) => {
+            const next = { ...prev.links };
+            delete next[id];
+            return { ...prev, links: next };
+          });
+          setRoomData((prev) => {
+            const folderKey = `f_${selectedFolder.id}`;
+            const folder = prev.links[folderKey];
+            if (!folder) return prev;
+            return {
+              ...prev,
+              links: {
+                ...prev.links,
+                [folderKey]: { ...folder, links: new Array(Math.max(0, folder.links.length - 1)) },
+              },
+            };
+          });
+        } else {
+          setRoomData((prev) => {
+            const next = { ...prev.links };
+            delete next[id];
+            return { ...prev, links: next };
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to delete card:", err);
+    }
+  };
+
+  const saveCard = async ({ id, type, title, link, color, pinned }) => {
+    try {
+      if (type === "folder") {
+        const row = await updateFolder(id, title, color, null, pinned);
+        const patch = { title: row.title, color: row.color, isPinned: row.pinned ?? false };
+        const key = `f_${id}`;
+        if (selectedFolder) {
+          setFolderData((prev) => ({
+            ...prev,
+            links: { ...prev.links, [key]: { ...prev.links[key], ...patch } },
+          }));
+        }
+        setRoomData((prev) => ({
+          ...prev,
+          links: { ...prev.links, [key]: { ...prev.links[key], ...patch } },
+        }));
+      } else {
+        const row = await updateLink(id, link, title, color, pinned);
+        const patch = { title: row.title, link: row.links ?? "", color: row.color, isPinned: row.pinned ?? false };
+        if (selectedFolder) {
+          setFolderData((prev) => ({
+            ...prev,
+            links: { ...prev.links, [id]: { ...prev.links[id], ...patch } },
+          }));
+        } else {
+          setRoomData((prev) => ({
+            ...prev,
+            links: { ...prev.links, [id]: { ...prev.links[id], ...patch } },
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to update card:", err);
+    }
+  };
+
   if (!roomId) {
     return (
-      <div className="w-full h-full flex items-center justify-center app-bg overflow-hidden">
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-linear-120 from-[#1E221D] to-[#0E100E] overflow-hidden">
         <p className="text-[#77f298] text-xl">Select a room to get started</p>
+        <button
+          onClick={openPopup}
+          className="px-6 py-2 rounded-full bg-[#77f298] text-black font-semibold hover:bg-[#5ee07e] transition-colors duration-150 cursor-pointer"
+        >
+          Join or Create a Room
+        </button>
       </div>
     );
   }
@@ -226,7 +320,14 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
   }
 
   return (
-    <div className="w-full h-full flex flex-col app-bg overflow-hidden">
+    <div className="w-full h-full flex flex-col bg-linear-120 from-[#1E221D] to-[#0E100E] overflow-hidden">
+      <EditCardPopup
+        isOpen={!!editItem}
+        onClose={() => setEditItem(null)}
+        onSave={saveCard}
+        item={editItem}
+        COLOR_OPTIONS={COLOR_OPTIONS}
+      />
       <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -261,6 +362,8 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
             sortOption={sortOption}
             viewMode={viewMode}
             onFolderClick={openFolder}
+            onEdit={setEditItem}
+            onDelete={(id, type) => deleteCard(id, type)}
           />
         </div>
         {/* Folder view — slides in from the right when folder opens */}
@@ -276,6 +379,8 @@ export default function Room({ roomId , COLOR_OPTIONS}) {
             sortOption={sortOption}
             viewMode={viewMode}
             onFolderClick={openFolder}
+            onEdit={setEditItem}
+            onDelete={(id, type) => deleteCard(id, type)}
           />
         </div>
       </div>
