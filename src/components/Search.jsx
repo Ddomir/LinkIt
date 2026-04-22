@@ -1,8 +1,5 @@
 import React, { useState } from 'react';                // Import React library and useState hook for managing state in the component
-import searchLogo from '../assets/search-logo.svg'; 
-import sortLogo from '../assets/sort-logo.svg'; 
-import filterLogo from '../assets/filter-logo.svg'; 
-import { List, LayoutGrid } from "lucide-react";
+import { List, LayoutGrid, SearchIcon, SortDesc, Filter} from "lucide-react";
 
 function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {}, viewMode = true, setViewMode = () => {} }) {
     const [showSort, setShowSort] = useState(false); // State to control visibility of sort options
@@ -47,12 +44,12 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                 <input 
                     type="text" 
                     placeholder="Search for links and folders..." 
-                    className="w-full h-10 px-3 pr-10 bg-[#0C0A0A] text-white border border-[D9D9D9] rounded-full" 
+                    className="w-full h-10 px-3 pr-10 bg-(--surface) text-(--text) border border-[D9D9D9] rounded-full" 
                     value={searchQuery}
                     onChange={handleInputChange}
                     onPaste={handlePaste}
                 />
-                <img src={searchLogo} alt="search icon" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 sm:w-4 sm:h-4" />
+                <SearchIcon className="absolute text-(--text) right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 sm:w-4 sm:h-4" />
             </div>
 
             {/* Buttons grouped to the right of the search bar */}
@@ -60,13 +57,13 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                 <div className="relative">
                     <button 
                         onClick={() => setShowSort(!showSort)}
-                        className="flex items-center gap-2 px-3 py-2 bg-[#0C0A0A] text-white rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
-                        <img src={sortLogo} alt="sort icon" className="w-6 h-6 min-w-3.5 min-h-3.5" />
+                        className="flex items-center gap-2 px-3 py-2 bg-(--surface) text-(--text) rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
+                        <SortDesc className="w-6 h-6 min-w-3.5 min-h-3.5" />
                         <span className="hidden sm:inline">Sort</span>
                     </button>
 
                     {showSort && (
-                        <div className="absolute mt-2 right-0 bg-[#0C0A0A] text-gray-300 font-semibold border border-[D9D9D9] rounded-lg p-3">
+                        <div className="absolute mt-2 right-0 bg-(--surface) text-(--text) font-semibold border border-[D9D9D9] rounded-lg p-3">
                             <label className="flex items-center">
                                 <input type="radio" name="sort" checked={sortOption === 'az'} onChange={() => onSortChange('az')} /> 
                                 <span className="ml-1"> A-Z </span>
@@ -90,13 +87,13 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                 <div className="relative">
                     <button 
                         onClick={() => setShowFilter(!showFilter)}
-                        className="flex items-center gap-2 px-3 py-2 bg-[#0C0A0A] text-white rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
-                        <img src={filterLogo} alt="filter icon" className="w-6 h-6 min-w-3.5 min-h-3.5" />
+                        className="flex items-center gap-2 px-3 py-2 bg-(--surface) text-(--text) rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
+                        <Filter className="w-6 h-6 min-w-3.5 min-h-3.5" />
                         <span className="hidden sm:inline">Filter</span>
                     </button>
 
                     {showFilter && (
-                        <div className="absolute mt-2 right-0 bg-[#0C0A0A] text-gray-300 font-semibold border border-[D9D9D9] rounded-lg p-3">
+                        <div className="absolute mt-2 right-0 bg-(--surface) text-(--text) font-semibold border border-[D9D9D9] rounded-lg p-3">
                             <label className="flex items-center">  
                                 <input type="checkbox" checked={!!filters.folders} onChange={(e) => onFilterChange({ ...filters, folders: e.target.checked })} /> 
                                 <span className="ml-1"> Folders </span>
@@ -116,12 +113,12 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
                 <div className="hidden sm:flex">
                     <button 
                         onClick={() => setViewMode(!viewMode)}
-                        className={`${viewMode ? `bg-white text-[#0C0A0A]` : `bg-[#0C0A0A] text-white`} pl-3 pr-1.5 py-2  rounded-l-full border border-r-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
+                        className={`${viewMode ? `bg-(--text) text-(--surface)` : `bg-(--surface) text-(--text)`} pl-3 pr-1.5 py-2  rounded-l-full border border-r-[0.5px] border-(--text) transition-transform duration-200 hover:scale-105 cursor-pointer`}>
                         <LayoutGrid className="size-6" />
                     </button>
                     <button 
                         onClick={() => setViewMode(!viewMode)}
-                        className={`${viewMode ? `bg-[#0C0A0A] text-white` : `bg-white text-[#0C0A0A]`} pr-3 pl-1.5 py-2 rounded-r-full border border-l-[0.5px] border-white transition-transform duration-200 hover:scale-105 cursor-pointer`}>
+                        className={`${viewMode ? `bg-(--surface) text-(--text)` : `bg-(--text) text-(--surface)`} pr-3 pl-1.5 py-2 rounded-r-full border border-l-[0.5px] border-(--text) transition-transform duration-200 hover:scale-105 cursor-pointer`}>
                         <List className="size-6" />
                     </button>
                 </div>
