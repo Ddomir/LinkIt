@@ -12,16 +12,15 @@ export async function getFolderById(id) {
   return data
 }
 
-// TODO: determine whether or not nested folders are allowed
-export async function createFolder(name, color, icon, parent_room) {
-  const { data, error } = await supabase.from('folders').insert({ title: name, color: color, icon: icon, room_id: parent_room }).select().single()
+export async function createFolder(name, color, icon, parent_room, parent_folder = null) {
+  const { data, error } = await supabase.from('folders').insert({ title: name, color: color, icon: icon, room_id: parent_room, folder_id: parent_folder }).select().single()
   if (error) throw error
   return data
 }
 
 // cannot change parent_room
-export async function updateFolder(id, name, color, icon) {
-  const { data, error } = await supabase.from('folders').update({ title: name, color: color, icon: icon }).eq('id', id).select().single()
+export async function updateFolder(id, name, color, icon, pinned) {
+  const { data, error } = await supabase.from('folders').update({ title: name, color: color, icon: icon, pinned: pinned }).eq('id', id).select().single()
   if (error) throw error
   return data
 }
@@ -52,9 +51,16 @@ export async function getParentRoomByFolderId(id) {
   return data
 }
 
-// get all folders in a room
+// get root-level folders in a room (not nested inside another folder)
 export async function getFoldersByRoomId(room_id) {
-  const { data, error } = await supabase.from('folders').select('*').eq('room_id', room_id)
+  const { data, error } = await supabase.from('folders').select('*').eq('room_id', room_id).is('folder_id', null)
+  if (error) throw error
+  return data
+}
+
+// get direct subfolders of a folder
+export async function getSubfoldersByFolderId(folder_id) {
+  const { data, error } = await supabase.from('folders').select('*').eq('folder_id', folder_id)
   if (error) throw error
   return data
 }

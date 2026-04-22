@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import CreateRoomPopup from "./popups/CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
 
 
@@ -11,7 +12,9 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
 }
 
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, openPopup}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom, openPopup}) {
+    const [showPopup, setShowPopup] = useState(false)
+    const [openMenuId, setOpenMenuId] = useState(null)
     const [visible, setVisible] = useState(Boolean(isOpen)) // Local state to control if the sidebar is mounted at all, for animation purposes
 
     //Escape key closes overlay when in mobile overlay mode
@@ -48,20 +51,48 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
             <div className="flex-1 overflow-auto px-3 py-1 scrollbar-thin">
                 <div className="flex flex-col gap-1">
                     {rooms.map(room => (
-                        <button
+                        <div
                             key={room.id}
-                            onClick={() => onSelectRoom(room.id)}
-                            className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
-                                ${selectedRoomId === room.id ? 'bg-[#77f298] text-black': 'hover:bg-[#77f298]/15 hover:text-white'}`}
+                            className="relative group"
                         >
-                            <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
+                            <button
+                                onClick={() => { onSelectRoom(room.id); setOpenMenuId(null); }}
+                                className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
+                                    ${selectedRoomId === room.id ? 'bg-[#77f298] text-black' : 'hover:bg-[#77f298]/15 hover:text-white'}`}
+                            >
+                                <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
+                                <span className="truncate">{room.name}</span>
+                            </button>
 
-                            <span className="truncate">{room.name}</span>
-                        </button>
+                            {/* Three-dots button, visible on hover or when menu is open */}
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === room.id ? null : room.id); }}
+                                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-opacity duration-150 cursor-pointer
+                                    ${selectedRoomId === room.id ? 'text-black hover:bg-black/10' : 'text-white hover:bg-white/10'}
+                                    ${openMenuId === room.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                                aria-label="Room options"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                    <path d="M6 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                                </svg>
+                            </button>
+
+                            {/* Dropdown menu */}
+                            {openMenuId === room.id && (
+                                <div className="absolute right-0 top-full mt-1 z-50 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); onLeaveRoom && onLeaveRoom(room.id); }}
+                                        className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
+                                    >
+                                        Leave room
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
 
-                <div className="flex flex-grow">
+                <div className="flex grow">
                 </div>
 
                 <button
@@ -116,7 +147,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     onClick={onClose}
                 />
                 {/* Sliding panel: GPU-accelerated transform, will-change hint, longer duration + custom easing */}
-                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-[transform] transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-transform transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                     {content}
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef, createContext} from 'react'
 import { getColors } from '../api/colors'
 import CreateRoomPopup from '../components/CreateRoomPopup'
+import { removeRoomUser } from "../api/rooms/roomUsers";
 
 
 const REVERSE_ICON_MAP = {
@@ -119,6 +120,18 @@ export default function Dashboard({session ,callback}) {
     }
   }
 
+  async function leaveRoomDB(room_id) {
+    if (!session?.user) return;
+    const { user } = session;
+    try {
+      await removeRoomUser(user.id, room_id);
+      setRooms((prev) => prev.filter(r => r.id !== room_id));
+      if (selectedRoomId === room_id) setSelectedRoomId(null);
+    } catch (err) {
+      console.error("Failed to leave room:", err);
+    }
+  }
+
   async function joinRoomDB(code) {
     if (!session?.user) {
       console.error("No active session found.");
@@ -178,26 +191,26 @@ export default function Dashboard({session ,callback}) {
         />
         
         <div className="hidden lg:block lg:flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} openPopup={() => setShowRoomPopup(true)} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} openPopup={() => setShowRoomPopup(true)} />
         </div>
 
         {/* Mobile hamburger + overlay sidebar - only visible on smaller screens */}
-        <div className="md:hidden"> 
+        <div className="md:hidden">
           <button
             className ="m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2"
             aria-label="Open menu"
             onClick={() => setMobileOpen(prev => !prev)}
           >
-            {/* simple hamburger icon */} 
-            <svg xmlns="http://www.w3.org/2000/svg" className ="w-6 h-6" fill="none" viewBox=" 0 0 24 24" strokeWidth={2} stroke="currentColor"> 
+            {/* simple hamburger icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" className ="w-6 h-6" fill="none" viewBox=" 0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} />
         </div>
         
-        <div className="flex-1 min-h-0 h-full">
+        <div className="flex-1 min-w-0 h-full overflow-hidden">
           <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} />
         </div>
       </div>

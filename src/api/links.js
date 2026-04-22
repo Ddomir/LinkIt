@@ -21,8 +21,8 @@ export async function createLink(name, title, color, room_id, folder_id) {
 }
 
 // cannot change parent folder or room
-export async function updateLink(id, name, title, color) {
-  const { data, error } = await supabase.from('links').update({ link_name: name, title: title, color: color }).eq('id', id).select().single()
+export async function updateLink(id, name, title, color, pinned) {
+  const { data, error } = await supabase.from('links').update({ links: name, title: title, color: color, pinned: pinned }).eq('id', id).select().single()
   if (error) throw error
   return data
 }
@@ -56,6 +56,20 @@ export async function getParentRoomByLinkId(id) {
 // get all top-level links in a room (not inside a folder)
 export async function getLinksByRoomId(room_id) {
   const { data, error } = await supabase.from('links').select('*').eq('room_id', room_id).is('parentfolder', null)
+  if (error) throw error
+  return data
+}
+
+// get all links inside a specific folder
+export async function getLinksByFolderId(folder_id) {
+  const { data, error } = await supabase.from('links').select('*').eq('parentfolder', folder_id)
+  if (error) throw error
+  return data
+}
+
+// get parentfolder for all links in a room, used to compute folder link counts
+export async function getLinkFolderIdsByRoomId(room_id) {
+  const { data, error } = await supabase.from('links').select('id, parentfolder').eq('room_id', room_id).not('parentfolder', 'is', null)
   if (error) throw error
   return data
 }

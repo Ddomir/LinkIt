@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, Folder, X, ChevronDown } from "lucide-react";
+import { Link, Folder, X, ChevronDown, FolderOpen } from "lucide-react";
 
-export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIONS }) {
+export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIONS, selectedFolder }) {
     const [type, setType] = useState("");
     const [openSection, setOpenSection] = useState("");
     const [title, setTitle] = useState("");
@@ -56,7 +56,7 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center justify-between mb-3">
                     <h2 className="text-[#77f298] text-lg font-bold">Add New Card</h2>
                     <button
                         onClick={() => { resetAll(); onClose(); }}
@@ -65,6 +65,13 @@ export default function CreateLinkPopup({ isOpen, onClose, onCreate, COLOR_OPTIO
                         <X size={16} />
                     </button>
                 </div>
+
+                {selectedFolder && (
+                    <div className="flex items-center gap-1.5 mb-4 text-xs text-white/40">
+                        <FolderOpen size={12} />
+                        <span>Adding to <span className="text-white/60 font-medium">{selectedFolder.title}</span></span>
+                    </div>
+                )}
 
                 <div className="flex flex-col gap-2">
 
