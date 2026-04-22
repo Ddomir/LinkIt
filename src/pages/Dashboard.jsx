@@ -7,7 +7,7 @@ import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
 import {useState, useEffect, useRef, createContext} from 'react'
 import { getColors } from '../api/colors'
-import CreateRoomPopup from '../components/CreateRoomPopup'
+import CreateRoomPopup from '../components/popups/CreateRoomPopup'
 import { removeRoomUser } from "../api/rooms/roomUsers";
 
 
