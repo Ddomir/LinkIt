@@ -40,13 +40,12 @@ export async function createInvite(room_id, expiresAt = null) {
   await supabase.from('invites').delete().eq('room_id', room_id);
 
   const code = generateRandomString();
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('invites')
     .insert({ room_id, link: code, expires_at: expiresAt ?? null })
-    .select()
-    .single()
   if (error) throw error
-  return data
+  // Return a local object — avoids a SELECT that can trip RLS
+  return { room_id, link: code, expires_at: expiresAt ?? null }
 }
 
 // Replace the current invite with a new code and expiry

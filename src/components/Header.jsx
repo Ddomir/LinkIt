@@ -16,6 +16,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
     };
 
     const isOwner = userRole === ROLE_OWNER;
+    const canManageInvites = userRole >= 9;
     const canAdd = !!onAddCard;
 
     return (
@@ -33,7 +34,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                 {/* Right actions */}
                 {!readOnly ? (
                     <div className="flex items-center gap-1">
-                        {isOwner && (
+                        {canManageInvites && (
                             <button
                                 className="text-white hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
                                 aria-label="Room settings"
@@ -51,7 +52,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                                 <Plus size={18} strokeWidth={3} />
                             </button>
                         )}
-                        {!isOwner && !canAdd && <div className="w-10" />}
+                        {!canManageInvites && !canAdd && <div className="w-10" />}
                     </div>
                 ) : (
                     <div className="w-10" />
@@ -67,7 +68,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
 
                     {!readOnly && (
                     <div className="flex items-center gap-2">
-                        {isOwner && (
+                        {canManageInvites && (
                             <button
                                 className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
                                 aria-label="Room settings"
@@ -136,6 +137,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
             isPrivate={isPrivateRoom}
             inviteData={inviteData}
             currentUserId={currentUserId}
+            userRole={userRole}
             onRoomDeleted={onRoomDeleted}
             onRoomRenamed={(id, newName) => { onRoomRenamed?.(id, newName); setShowSettings(false); }}
             onInviteRegenerated={onInviteRegenerated}

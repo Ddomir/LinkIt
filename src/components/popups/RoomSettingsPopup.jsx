@@ -33,7 +33,7 @@ function formatExpiry(expiresAt) {
     return `Expires ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
 }
 
-export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, isPrivate, inviteData: initialInviteData, currentUserId, onRoomDeleted, onRoomRenamed, onInviteRegenerated }) {
+export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, isPrivate, inviteData: initialInviteData, currentUserId, userRole, onRoomDeleted, onRoomRenamed, onInviteRegenerated }) {
     const [tab, setTab] = useState("invite");
     const [name, setName] = useState(roomName);
     const [privateRoom, setPrivateRoom] = useState(isPrivate);
@@ -130,10 +130,14 @@ export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, i
         setConfirmKick(null);
     };
 
+    const isOwner = userRole === ROLE_OWNER;
+    // Editors only see Invite; Owners see all tabs
     const TABS = [
         { id: "invite",  label: "Invite" },
-        { id: "members", label: "Members" },
-        { id: "general", label: "General" },
+        ...(isOwner ? [
+            { id: "members", label: "Members" },
+            { id: "general", label: "General" },
+        ] : []),
     ];
 
     return createPortal(
