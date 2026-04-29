@@ -26,14 +26,7 @@ export async function fetchRooms(UUID) {
     .select('role, rooms!inner (*)')
     .eq('UID', UUID)
 
-    //Catches errors
-    if(error){
-        console.error("❌ Get data Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Get data Success! Data:", data);
-    }
-    //Returns the data
+    if(error) throw error;
     return data
 }
 
@@ -47,8 +40,6 @@ export async function fetchRooms(UUID) {
         iconId      The id of the user in the public.icon table. Defaults to "null"
 */
 export async function createRoom(user_id, room_name = "Untitled Room", isPrivate = false, iconId = null){
-    console.log("Attempting to insert: ", user_id, " creating room ", room_name);
-
     const { data, error } = await supabase
         .from('rooms')
         .insert({ 
@@ -60,13 +51,7 @@ export async function createRoom(user_id, room_name = "Untitled Room", isPrivate
         .select()
         .single()
     
-    //Catches errors
-    if(error){
-        console.error("❌ Insert Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Insert Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 
@@ -84,13 +69,7 @@ export async function updateRoomName(id, room_name) {
     .select()           //Gets the entire updated row sent back
     .single()           //Only send that row back
 
-    //Catches errors
-    if(error){
-        console.error("❌ Update Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Update Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 
@@ -108,13 +87,7 @@ export async function updatePrivateStatus(id, private_status) {
     .select()           //Gets the entire updated row sent back
     .single()           //Only send that row back
 
-    //Catches errors
-    if(error){
-        console.error("❌ Update Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Update Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 
@@ -140,13 +113,7 @@ export async function linkIcon(id, iconId){
     .select()           //Gets the entire updated row sent back
     .single()           //Only send that row back
 
-    //Catches errors
-    if(error){
-        console.error("❌ Update Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Update Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 

@@ -20,7 +20,6 @@ export async function inviteCodeExists(content) {
   if (error || !invite) return []
 
   if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
-    console.log("Invite code", content, "has expired");
     return []
   }
 

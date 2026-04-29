@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Copy, Check, Trash2, Shield, Eye, RefreshCw, Clock } from "lucide-react";
-import { getRoomMembers, updateUserRole, removeRoomUser } from "../../api/rooms/roomUsers";
+import { Copy, Check, Trash2, Shield, Eye, RefreshCw, Clock, Crown } from "lucide-react";
+import { getRoomMembers, updateUserRole, removeRoomUser, transferOwnership } from "../../api/rooms/roomUsers";
 import { updateRoomName, updatePrivateStatus } from "../../api/rooms/rooms";
 import { regenerateInvite } from "../../api/invites";
 import ConfirmPopup from "./ConfirmPopup";
@@ -33,7 +33,7 @@ function formatExpiry(expiresAt) {
     return `Expires ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
 }
 
-export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, isPrivate, inviteData: initialInviteData, currentUserId, userRole, onRoomDeleted, onRoomRenamed, onInviteRegenerated }) {
+export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, isPrivate, inviteData: initialInviteData, currentUserId, userRole, onRoomDeleted, onRoomRenamed, onOwnershipTransferred, onInviteRegenerated }) {
     const [tab, setTab] = useState("invite");
     const [name, setName] = useState(roomName);
     const [privateRoom, setPrivateRoom] = useState(isPrivate);
@@ -43,6 +43,7 @@ export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, i
     const [copiedLink, setCopiedLink] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [confirmKick, setConfirmKick] = useState(null);
+    const [confirmTransfer, setConfirmTransfer] = useState(null); // { uid, name }
     const [saving, setSaving] = useState(false);
     const [inviteData, setInviteData] = useState(initialInviteData);
     const [selectedExpiry, setSelectedExpiry] = useState(null); // hours or null
@@ -128,6 +129,14 @@ export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, i
         await removeRoomUser(confirmKick.uid, roomId);
         setMembers(prev => prev.filter(m => m.UID !== confirmKick.uid));
         setConfirmKick(null);
+    };
+
+    const handleTransferOwnership = async () => {
+        if (!confirmTransfer) return;
+        await transferOwnership(roomId, currentUserId, confirmTransfer.uid);
+        setConfirmTransfer(null);
+        onOwnershipTransferred?.(roomId);
+        onClose();
     };
 
     const isOwner = userRole === ROLE_OWNER;
@@ -262,13 +271,25 @@ export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, i
                                                 {!isMe && (
                                                     <>
                                                         <select
-                                                            value={m.role}
-                                                            onChange={e => handleRoleChange(m.UID, e.target.value)}
-                                                            className="bg-[#0C0A0A] border border-white/10 text-white text-xs rounded-lg px-2 py-1 cursor-pointer outline-none"
+                                                            value={m.role === ROLE_OWNER ? ROLE_OWNER : m.role}
+                                                            onChange={e => handleRoleChange(m.UID, Number(e.target.value))}
+                                                            disabled={m.role === ROLE_OWNER}
+                                                            className="bg-[#0C0A0A] border border-white/10 text-white text-xs rounded-lg px-2 py-1 cursor-pointer outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                                                         >
                                                             <option value={ROLE_VIEWER}>Viewer</option>
                                                             <option value={ROLE_EDITOR}>Editor</option>
+                                                            {m.role === ROLE_OWNER && <option value={ROLE_OWNER}>Owner</option>}
                                                         </select>
+                                                        {isOwner && m.role !== ROLE_OWNER && (
+                                                            <button
+                                                                onClick={() => setConfirmTransfer({ uid: m.UID, name: displayName })}
+                                                                className="p-1 rounded-md text-white/30 hover:text-yellow-400 hover:bg-yellow-500/10 transition-colors cursor-pointer"
+                                                                aria-label="Transfer ownership"
+                                                                title="Transfer ownership"
+                                                            >
+                                                                <Crown size={14} />
+                                                            </button>
+                                                        )}
                                                         <button
                                                             onClick={() => setConfirmKick({ uid: m.UID, name: displayName })}
                                                             className="p-1 rounded-md text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
@@ -361,6 +382,15 @@ export default function RoomSettingsPopup({ isOpen, onClose, roomId, roomName, i
             confirmLabel="Remove"
             onConfirm={handleKick}
             onCancel={() => setConfirmKick(null)}
+        />
+
+        <ConfirmPopup
+            isOpen={!!confirmTransfer}
+            title={`Transfer ownership to ${confirmTransfer?.name ?? "this member"}?`}
+            message="They will become the owner. You will be downgraded to editor."
+            confirmLabel="Transfer"
+            onConfirm={handleTransferOwnership}
+            onCancel={() => setConfirmTransfer(null)}
         />
         </>,
         document.body

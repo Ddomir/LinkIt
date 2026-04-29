@@ -8,7 +8,7 @@ import { Plus, Settings, Share2 } from "lucide-react";
 const ROLE_VIEWER = 8;
 const ROLE_OWNER = 10;
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, currentUserId = null, roomId, onRoomDeleted, onRoomRenamed, onInviteRegenerated }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, currentUserId = null, roomId, onRoomDeleted, onRoomRenamed, onOwnershipTransferred, onInviteRegenerated }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showShare, setShowShare] = useState(false);
@@ -168,6 +168,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
             userRole={userRole}
             onRoomDeleted={onRoomDeleted}
             onRoomRenamed={(id, newName) => { onRoomRenamed?.(id, newName); setShowSettings(false); }}
+            onOwnershipTransferred={onOwnershipTransferred}
             onInviteRegenerated={onInviteRegenerated}
         />
         </>

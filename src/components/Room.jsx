@@ -11,7 +11,7 @@ export const ROLE_VIEWER = 8;
 export const ROLE_EDITOR = 9;
 export const ROLE_OWNER  = 10;
 
-export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, onRoomDeleted, onRoomRenamed, currentUserId = null, pendingRoom = null, onJoinPending }) {
+export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, onRoomDeleted, onRoomRenamed, onOwnershipTransferred, currentUserId = null, pendingRoom = null, onJoinPending }) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -410,6 +410,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
         roomId={roomId}
         onRoomDeleted={onRoomDeleted}
         onRoomRenamed={onRoomRenamed}
+        onOwnershipTransferred={onOwnershipTransferred}
         onInviteRegenerated={setInviteData}
       />
       {readOnly && pendingRoom && pendingRoom.id === roomId && !pendingRoom.isPrivate && (

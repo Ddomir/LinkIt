@@ -19,12 +19,7 @@ export async function joinRoom(UID, room_id) {
         .select()
         .single()
 
-        if(error){
-            console.error("❌ Insert Failed:", error.message);
-            throw error;
-        } else {
-            console.log("✅ Insert Success! Data:", data);
-        }
+        if(error) throw error;
         return data
 }
 
@@ -37,12 +32,7 @@ export async function getUserJoinedRooms(UID) {
         .from('room_users')
         .select('room_id')
         .eq('UID', UID)
-        if(error){
-            console.error("❌ Get Failed:", error.message);
-            throw error;
-        } else {
-            console.log("✅ Get Success! Data:", data);
-        }
+        if(error) throw error;
         return data
 }
 
@@ -61,14 +51,7 @@ export async function getUser(UUID) {
     .eq('UUID', UUID)
     .single()
 
-    //Catches errors
-    if(error){
-        console.error("❌ Get data Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Get data Success! Data:", data);
-    }
-    //Returns the data
+    if(error) throw error;
     return data
 }
 
@@ -98,13 +81,7 @@ export async function updateUsername(id, userName){
     .select()           //Gets the entire updated row sent back
     .single()           //Only send that row back
 
-    //Catches errors
-    if(error){
-        console.error("❌ Update Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Update Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 

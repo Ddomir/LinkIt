@@ -111,7 +111,6 @@ export default function Dashboard({session, callback, joinCode}) {
     hasResolvedJoin.current = true;
 
     const resolve = async () => {
-      console.log('[joinCode] resolving:', joinCode);
       sessionStorage.removeItem('pendingJoinCode');
 
       const { data: invite } = await supabase
@@ -143,7 +142,6 @@ export default function Dashboard({session, callback, joinCode}) {
         .eq('room_id', roomId)
         .maybeSingle();
 
-      console.log('[joinCode] membership:', membership, memErr);
       if (membership) {
         setSelectedRoomId(roomId);
       } else {
@@ -170,7 +168,6 @@ export default function Dashboard({session, callback, joinCode}) {
     
     try {
       const newRoom = await createRoom(user.id, room_name, private_status, iconId);
-      console.log("Room created successfully");
 
       await createInvite(newRoom.id);
       await createRoomUser(user.id, newRoom.id, 10); // 10 is the role id for owner!
@@ -217,6 +214,10 @@ export default function Dashboard({session, callback, joinCode}) {
     setRooms(prev => prev.map(r => r.id === room_id ? { ...r, name: newName } : r));
   }
 
+  function demoteOwnerToEditor(room_id) {
+    setRooms(prev => prev.map(r => r.id === room_id ? { ...r, role: 9 } : r));
+  }
+
   async function joinPendingRoom() {
     if (!pendingRoom) return;
     await joinRoomDB(pendingRoom.code);
@@ -255,7 +256,6 @@ export default function Dashboard({session, callback, joinCode}) {
         return;
       }
 
-      console.log("User joined room ", newRoom, " successfully");
 
       const formattedNewRoom = {
         id: newRoom.id,
@@ -351,6 +351,7 @@ export default function Dashboard({session, callback, joinCode}) {
             isPrivateRoom={rooms.find(r => r.id === selectedRoomId)?.isPrivate ?? false}
             onRoomDeleted={deleteRoomDB}
             onRoomRenamed={renameRoomLocal}
+            onOwnershipTransferred={demoteOwnerToEditor}
             currentUserId={session?.user?.id}
             pendingRoom={pendingRoom}
             onJoinPending={joinPendingRoom}

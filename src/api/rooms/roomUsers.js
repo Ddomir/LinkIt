@@ -10,10 +10,7 @@ export async function createRoomUser(user_id, room_id, role){
             role: role,
         })
 
-    if(error){
-        console.error("❌ Insert Failed:", error.message);
-        throw error;
-    }
+    if(error) throw error;
 }
 
 async function userInRoom(user_id, room_id) {
@@ -65,6 +62,16 @@ export async function updateUserRole(user_id, room_id, role) {
         .eq('UID', user_id)
         .eq('room_id', room_id)
     if (error) throw error
+}
+
+// Atomically demotes current owner to editor and promotes new_owner_id to owner.
+export async function transferOwnership(room_id, current_owner_id, new_owner_id) {
+    const [demote, promote] = await Promise.all([
+        supabase.from('room_users').update({ role: 9 }).eq('UID', current_owner_id).eq('room_id', room_id),
+        supabase.from('room_users').update({ role: 10 }).eq('UID', new_owner_id).eq('room_id', room_id),
+    ]);
+    if (demote.error) throw demote.error;
+    if (promote.error) throw promote.error;
 }
 
 export async function removeRoomUser(user_id, room_id) {

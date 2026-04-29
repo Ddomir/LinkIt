@@ -17,14 +17,7 @@ export async function getAllIcons() {
     .select('*')
     .order('id', { ascending: true })
 
-    //Catches errors
-    if(error){
-        console.error("❌ Get data Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Get icons data Success! Data:", data);
-    }
-    //Returns the data
+    if(error) throw error;
     return data
 }
 
@@ -40,14 +33,7 @@ export async function getIcon(id) {
     .eq('id', id)
     .single()
 
-    //Catches errors
-    if(error){
-        console.error("❌ Get data Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Get data Success! Data:", data);
-    }
-    //Returns the data
+    if(error) throw error;
     return data
 }
 
@@ -65,13 +51,7 @@ export async function createIcon(icon_url){
         .select()
         .single()
     
-    //Catches errors
-    if(error){
-        console.error("❌ Insert Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Insert Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 
@@ -88,13 +68,7 @@ export async function updateIcon(id, icon_url){
     .select()           //Gets the entire updated row sent back
     .single()           //Only send that row back
 
-    //Catches errors
-    if(error){
-        console.error("❌ Update Failed:", error.message);
-        throw error;
-    }else{
-        console.log("✅ Update Success! Data:", data);
-    }
+    if(error) throw error;
     return data
 }
 
