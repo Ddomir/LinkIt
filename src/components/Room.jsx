@@ -7,7 +7,7 @@ import { getFoldersByRoomId, getSubfoldersByFolderId, createFolder, updateFolder
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
+export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false }) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -329,7 +329,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
         COLOR_OPTIONS={COLOR_OPTIONS}
       />
       <div className="relative z-10 flex flex-col flex-1 min-h-0">
-      <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS}
+      <Header roomData={roomData} inviteData={inviteData} onAddCard={readOnly ? null : addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filters={filters}
@@ -339,6 +339,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
         viewMode={viewMode}
         setViewMode={setViewMode}
         selectedFolder={selectedFolder}
+        readOnly={readOnly}
       />
       {selectedFolder && (
         <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10 text-sm text-white/60">
@@ -363,8 +364,8 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
             sortOption={sortOption}
             viewMode={viewMode}
             onFolderClick={openFolder}
-            onEdit={setEditItem}
-            onDelete={(id, type) => deleteCard(id, type)}
+            onEdit={readOnly ? null : setEditItem}
+            onDelete={readOnly ? null : (id, type) => deleteCard(id, type)}
           />
         </div>
         {/* Folder view — slides in from the right when folder opens */}
@@ -380,8 +381,8 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
             sortOption={sortOption}
             viewMode={viewMode}
             onFolderClick={openFolder}
-            onEdit={setEditItem}
-            onDelete={(id, type) => deleteCard(id, type)}
+            onEdit={readOnly ? null : setEditItem}
+            onDelete={readOnly ? null : (id, type) => deleteCard(id, type)}
           />
         </div>
       </div>

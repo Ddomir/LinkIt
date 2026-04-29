@@ -4,7 +4,7 @@ import ShareInvite from "./popups/ShareInvite";
 import Search from "./Search";
 import { Share2, Plus, SquareArrowRightExit } from "lucide-react";
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false);
 
@@ -24,6 +24,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                 <div className="flex items-center justify-center sm:justify-between gap-2">
                     <h1 className="text-(--accent) text-3xl sm:text-4xl font-bold text-center sm:text-left pl-3">{roomData.name}</h1>
 
+                    {!readOnly && (
                     <div className="hidden sm:flex items-center justify-between gap-3">
                         <button
                             className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
@@ -41,6 +42,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                             <Plus size={28} strokeWidth={3}  />
                         </button>
                     </div>
+                    )}
                 </div>
 
                 <div className="w-full flex items-center justify-between gap-3">
@@ -61,6 +63,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
             </div>
 
             {/* Mobile floating buttons: fixed bottom-right on small screens */}
+            {!readOnly && (
             <div className="sm:hidden fixed right-4 bottom-6 flex flex-row gap-3 z-50">
                 <button
                     className="text-[#ffffff] hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
@@ -82,6 +85,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                     </svg>
                 </button>
             </div>
+            )}
 
             <CreateLinkPopup
                 COLOR_OPTIONS={COLOR_OPTIONS}
