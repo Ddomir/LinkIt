@@ -24,8 +24,8 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                 {/* Spacer to balance the right-side actions */}
                 <div className="w-10" />
 
-                {/* Centered room name */}
-                <h1 className="text-(--accent) text-2xl font-bold text-center absolute left-1/2 -translate-x-1/2">{roomData.name}</h1>
+                {/* Centered room name — shrinks to fit one line */}
+                <h1 className="text-(--accent) font-bold text-center absolute left-1/2 -translate-x-1/2 w-[55vw] truncate" style={{ fontSize: 'clamp(0.85rem, 5.5vw, 1.5rem)' }}>{roomData.name}</h1>
 
                 {/* Right actions */}
                 {!readOnly ? (

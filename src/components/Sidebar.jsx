@@ -31,12 +31,6 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
 
     const content = (
         <div className="flex flex-col surface h-full max-w-full">
-            {/* Drag handle — mobile only */}
-            {isMobile && (
-                <div className="flex justify-center pt-3 pb-1 cursor-pointer" onClick={onClose}>
-                    <div className="w-10 h-1 rounded-full bg-white/20" />
-                </div>
-            )}
 
             {/* Sidebar Header */}
             <div className="px-5 pt-4 pb-2">
@@ -85,7 +79,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                             {isMobile && leaveMode && (
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setLeaveConfirm(room.id); }}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors"
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors ${selectedRoomId === room.id ? 'bg-red-500 text-black hover:bg-red-400' : 'bg-red-500/20 text-red-400 hover:bg-red-500/40'}`}
                                     aria-label="Leave room"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
