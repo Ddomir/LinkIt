@@ -22,18 +22,18 @@ body {
     to   { opacity: 1; transform: translateY(0)     scale(1);    }
 }
 
-:root { /* Light theme variables */
-    --bg: #ffffff;
-    --surface: #f1f1f1; /*sidebar */
-    --text: #000000;   /* default text (LIGHT MODE) */
-    --accent: #10BC3E;
+:root { /* Dark theme variables (always dark) */
+    --bg: linear-gradient(120deg, #1E221D, #0E100E);
+    --surface: #0C0A0A;
+    --text: #ffffff;
+    --accent: #77f298;
     --accent-foreground: #071410;
     --transition: 180ms ease;
 }
-.dark { /* Dark theme variables */
+.dark {
     --bg: linear-gradient(120deg, #1E221D, #0E100E);
     --surface: #0C0A0A;
-    --text: #ffffff;   /* DARK MODE TEXT */
+    --text: #ffffff;
     --accent: #77f298;
     --accent-foreground: #071410;
 }
