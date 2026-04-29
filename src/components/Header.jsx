@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import CreateLinkPopup from "./popups/CreateLinkPopup";
 import RoomSettingsPopup from "./popups/RoomSettingsPopup";
+import ShareInvite from "./popups/ShareInvite";
 import Search from "./Search";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Share2 } from "lucide-react";
 
+const ROLE_VIEWER = 8;
 const ROLE_OWNER = 10;
 
 export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, currentUserId = null, roomId, onRoomDeleted, onRoomRenamed, onInviteRegenerated }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [showShare, setShowShare] = useState(false);
 
     const handleCreateLink = (data) => {
         if (onAddCard && data) onAddCard(data);
         setShowLinkPopup(false);
     };
 
+    const isViewer = userRole === ROLE_VIEWER;
     const isOwner = userRole === ROLE_OWNER;
     const canManageInvites = userRole >= 9;
     const canAdd = !!onAddCard;
@@ -34,6 +38,15 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                 {/* Right actions */}
                 {!readOnly ? (
                     <div className="flex items-center gap-1">
+                        {isViewer && inviteData && (
+                            <button
+                                className="text-white hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
+                                aria-label="Share room"
+                                onClick={() => setShowShare(true)}
+                            >
+                                <Share2 size={20} strokeWidth={2} />
+                            </button>
+                        )}
                         {canManageInvites && (
                             <button
                                 className="text-white hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
@@ -52,7 +65,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                                 <Plus size={18} strokeWidth={3} />
                             </button>
                         )}
-                        {!canManageInvites && !canAdd && <div className="w-10" />}
+                        {!isViewer && !canManageInvites && !canAdd && <div className="w-10" />}
                     </div>
                 ) : (
                     <div className="w-10" />
@@ -68,6 +81,15 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
 
                     {!readOnly && (
                     <div className="flex items-center gap-2">
+                        {isViewer && inviteData && (
+                            <button
+                                className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                                aria-label="Share room"
+                                onClick={() => setShowShare(true)}
+                            >
+                                <Share2 size={22} strokeWidth={2} />
+                            </button>
+                        )}
                         {canManageInvites && (
                             <button
                                 className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
@@ -127,6 +149,12 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
             onClose={() => setShowLinkPopup(false)}
             onCreate={handleCreateLink}
             selectedFolder={selectedFolder}
+        />
+
+        <ShareInvite
+            isOpen={showShare}
+            onClose={() => setShowShare(false)}
+            inviteData={inviteData}
         />
 
         <RoomSettingsPopup
