@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Folder, Pin, MoreHorizontal } from 'lucide-react';
+import ConfirmPopup from './popups/ConfirmPopup';
 
 export default function FolderCard({ id, type, title, links, roomid, color, icon, pinned, parentfolder, createdAt, colorMap, onClick, onEdit, onDelete }) {
     const bgStyle = colorMap?.[color] ?? {};
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+    const [confirmOpen, setConfirmOpen] = useState(false);
     const btnRef = useRef(null);
     const menuRef = useRef(null);
 
@@ -73,7 +75,7 @@ export default function FolderCard({ id, type, title, links, roomid, color, icon
                     {onDelete && (
                         <button
                             className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/10 transition-colors"
-                            onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onDelete(id); }}
+                            onClick={(e) => { e.stopPropagation(); setMenuOpen(false); setConfirmOpen(true); }}
                         >
                             Delete
                         </button>
@@ -81,6 +83,15 @@ export default function FolderCard({ id, type, title, links, roomid, color, icon
                 </div>,
                 document.body
             )}
+
+            <ConfirmPopup
+                isOpen={confirmOpen}
+                title="Delete folder?"
+                message={`"${title}" and all its contents will be permanently deleted.`}
+                confirmLabel="Delete"
+                onConfirm={() => { setConfirmOpen(false); onDelete(id); }}
+                onCancel={() => setConfirmOpen(false)}
+            />
         </div>
     );
 }

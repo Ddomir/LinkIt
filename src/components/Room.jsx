@@ -16,61 +16,76 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
   const [filters, setFilters] = useState({ folders: true, links: true, pinnedOnly: false });
   const [sortOption, setSortOption] = useState('pinned');
   const [viewMode, setViewMode] = useState(true); // true for tile view, false for list view
-  const [selectedFolder, setSelectedFolder] = useState(null); // { id, title } when inside a folder
-  const [folderData, setFolderData] = useState(null); // roomData-shaped object for folder contents
+  // Stack of { folder: {id, title}, data: {name, links} }
+  const [folderStack, setFolderStack] = useState([]);
   const [editItem, setEditItem] = useState(null); // item being edited
+
+  const selectedFolder = folderStack.length > 0 ? folderStack[folderStack.length - 1].folder : null;
+  const folderData = folderStack.length > 0 ? folderStack[folderStack.length - 1].data : null;
+
+  // Patch the data of the top folder in the stack
+  const setFolderData = (updater) => {
+    setFolderStack(prev => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      const top = next[next.length - 1];
+      next[next.length - 1] = { ...top, data: typeof updater === 'function' ? updater(top.data) : updater };
+      return next;
+    });
+  };
+
+  const fetchFolderContents = async (folder) => {
+    const [links, subfolders] = await Promise.all([
+      getLinksByFolderId(folder.id),
+      getSubfoldersByFolderId(folder.id),
+    ]);
+    const linksMap = {};
+    links.forEach((l) => {
+      linksMap[l.id] = {
+        id: l.id,
+        type: l.type,
+        title: l.title,
+        link: l.links ?? "",
+        roomid: l.room_id,
+        color: l.color,
+        icon: l.icon,
+        isPinned: l.pinned ?? false,
+        folderid: l.parentfolder,
+        createdAt: l.createdAt,
+      };
+    });
+    subfolders.forEach((f) => {
+      linksMap[`f_${f.id}`] = {
+        id: f.id,
+        type: "folder",
+        title: f.title,
+        links: [],
+        color: f.color,
+        icon: f.icon,
+        isPinned: f.pinned ?? false,
+        parentfolder: f.folder_id,
+        createdAt: f.created_at,
+      };
+    });
+    return { name: folder.title, links: linksMap };
+  };
 
   const openFolder = async (folder) => {
     try {
-      const [links, subfolders] = await Promise.all([
-        getLinksByFolderId(folder.id),
-        getSubfoldersByFolderId(folder.id),
-      ]);
-      const linksMap = {};
-      links.forEach((l) => {
-        linksMap[l.id] = {
-          id: l.id,
-          type: l.type,
-          title: l.title,
-          link: l.links ?? "",
-          roomid: l.room_id,
-          color: l.color,
-          icon: l.icon,
-          isPinned: l.pinned ?? false,
-          folderid: l.parentfolder,
-          createdAt: l.createdAt,
-        };
-      });
-      subfolders.forEach((f) => {
-        linksMap[`f_${f.id}`] = {
-          id: f.id,
-          type: "folder",
-          title: f.title,
-          links: [],
-          color: f.color,
-          icon: f.icon,
-          isPinned: f.pinned ?? false,
-          parentfolder: f.folder_id,
-          createdAt: f.created_at,
-        };
-      });
-      setFolderData({ name: folder.title, links: linksMap });
-      setSelectedFolder(folder);
+      const data = await fetchFolderContents(folder);
+      setFolderStack(prev => [...prev, { folder, data }]);
     } catch (err) {
       console.error("Failed to fetch folder contents:", err);
     }
   };
 
-  const closeFolder = () => {
-    setSelectedFolder(null);
-    setFolderData(null);
-  };
+  // Pop one level; if stack empties we're back at room root
+  const closeFolder = () => setFolderStack(prev => prev.slice(0, -1));
 
   useEffect(() => {
     if (!roomId) return;
 
-    setSelectedFolder(null);
-    setFolderData(null);
+    setFolderStack([]);
 
     const fetchRoomContent = async () => {
       setLoading(true);
@@ -341,13 +356,45 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
         selectedFolder={selectedFolder}
         readOnly={readOnly}
       />
-      {selectedFolder && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10 text-sm text-white/60">
-          <button onClick={closeFolder} className="hover:text-white transition-colors">
+      {folderStack.length > 0 && (
+        <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/10 text-sm flex-wrap">
+          {/* Back chevron — always goes up one level */}
+          <button
+            onClick={closeFolder}
+            className="flex items-center text-white/50 hover:text-white transition-colors cursor-pointer pr-1"
+            aria-label="Go back"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          {/* Room root */}
+          <button
+            onClick={() => setFolderStack([])}
+            className="text-white/50 hover:text-white transition-colors cursor-pointer"
+          >
             {roomData.name}
           </button>
-          <span>/</span>
-          <span className="text-white font-medium">{selectedFolder.title}</span>
+
+          {/* Each folder level except the last */}
+          {folderStack.slice(0, -1).map((entry, i) => (
+            <span key={entry.folder.id} className="flex items-center gap-1.5">
+              <span className="text-white/20">/</span>
+              <button
+                onClick={() => setFolderStack(prev => prev.slice(0, i + 1))}
+                className="text-white/50 hover:text-white transition-colors cursor-pointer"
+              >
+                {entry.folder.title}
+              </button>
+            </span>
+          ))}
+
+          {/* Current folder — not clickable */}
+          <span className="flex items-center gap-1.5">
+            <span className="text-white/20">/</span>
+            <span className="text-white font-medium">{selectedFolder.title}</span>
+          </span>
         </div>
       )}
       <div className="flex-1 min-h-0 relative overflow-hidden">

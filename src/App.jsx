@@ -4,15 +4,16 @@ import { supabase } from './supabaseClient';
 import Dashboard from './pages/Dashboard';
 import GuestView from './pages/GuestView';
 
+
 function getGuestRoomCode() {
   const match = window.location.pathname.match(/^\/room\/([A-Z0-9]+)$/i);
   return match ? match[1].toUpperCase() : null;
 }
 
 function App() {
-	const [session, setSession] = useState(null);
+  const [session, setSession] = useState(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
-  const guestCode = getGuestRoomCode();
+  const guestCode = getGuestRoomCode() || sessionStorage.getItem('pendingJoinCode');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -27,6 +28,8 @@ function App() {
   }, []);
 
   const handleGoogleLogin = async () => {
+    if (guestCode) sessionStorage.setItem('pendingJoinCode', guestCode);
+
     const redirectTo = import.meta.env.DEV
       ? window.location.origin
       : import.meta.env.VITE_REDIRECT_URL;
@@ -45,16 +48,12 @@ function App() {
 
   if (!sessionLoaded) return null;
 
-  // Logged-in user on a /room/:code path — go to dashboard, they can join normally
-  if (session && guestCode) {
-    return <Dashboard session={session} callback={handleLogout} />;
-  }
-
+  // Logged-in: Dashboard handles both normal use and join-from-link
   if (session) {
-    return <Dashboard session={session} callback={handleLogout} />;
+    return <Dashboard session={session} callback={handleLogout} joinCode={guestCode} />;
   }
 
-  // Guest visiting /room/:code
+  // Not logged in on a /room/:code — guest read-only view
   if (guestCode) {
     return <GuestView inviteCode={guestCode} onLogin={handleGoogleLogin} />;
   }

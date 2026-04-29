@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Pin, MoreHorizontal } from 'lucide-react';
+import ConfirmPopup from './popups/ConfirmPopup';
 
 function normalizeUrl(link) {
     if (!link) return "";
@@ -21,6 +22,7 @@ export default function LinkCard({ id, type, title, link, roomid, color, icon, p
     const [faviconError, setFaviconError] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+    const [confirmOpen, setConfirmOpen] = useState(false);
     const btnRef = useRef(null);
     const dropdownRef = useRef(null);
     const normalizedLink = normalizeUrl(link);
@@ -152,7 +154,7 @@ export default function LinkCard({ id, type, title, link, roomid, color, icon, p
                     {onDelete && (
                         <button
                             className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/10 transition-colors"
-                            onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onDelete(id); }}
+                            onClick={(e) => { e.stopPropagation(); setMenuOpen(false); setConfirmOpen(true); }}
                         >
                             Delete
                         </button>
@@ -160,6 +162,15 @@ export default function LinkCard({ id, type, title, link, roomid, color, icon, p
                 </div>,
                 document.body
             )}
+
+            <ConfirmPopup
+                isOpen={confirmOpen}
+                title="Delete link?"
+                message={`"${title}" will be permanently deleted.`}
+                confirmLabel="Delete"
+                onConfirm={() => { setConfirmOpen(false); onDelete(id); }}
+                onCancel={() => setConfirmOpen(false)}
+            />
         </div>
     );
 }

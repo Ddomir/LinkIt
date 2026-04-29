@@ -9,6 +9,7 @@ import {useState, useEffect, useRef, useCallback, createContext} from 'react'
 import { getColors } from '../api/colors'
 import CreateRoomPopup from '../components/popups/CreateRoomPopup'
 import { removeRoomUser } from "../api/rooms/roomUsers";
+import { supabase } from '../supabaseClient';
 
 
 const REVERSE_ICON_MAP = {
@@ -25,21 +26,21 @@ const REVERSE_ICON_MAP = {
   24: "globe"
 };
 
-export default function Dashboard({session ,callback}) {
+export default function Dashboard({session, callback, joinCode}) {
   const [rooms, setRooms] = useState([])
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [joinError, setJoinError] = useState(null)
   const [COLOR_OPTIONS, setColorOptions] = useState([])
-  const [mobileOpen, setMobileOpen] = useState(true) // State to track if the sidebar is open on mobile
-  const [sidebarWidth, setSidebarWidth] = useState(288) // 288px = w-72
+  const [mobileOpen, setMobileOpen] = useState(true)
+  const [sidebarWidth, setSidebarWidth] = useState(288)
   const isDragging = useRef(false)
   const dragStartX = useRef(0)
   const dragStartWidth = useRef(0)
   const MIN_SIDEBAR = 200
   const MAX_SIDEBAR = 480
   const [showRoomPopup, setShowRoomPopup] = useState(false)
+  const [pendingRoom, setPendingRoom] = useState(null) // { id, name, icon, code } — invited but not yet joined
 
-  // Add a ref to track if we've already synced this specific user ID
   const hasSynced = useRef(false);
 
   useEffect(()=>{    
@@ -98,6 +99,52 @@ export default function Dashboard({session ,callback}) {
 
   },[session])
 
+  // Resolve joinCode: already a member → select it; not a member → show pending entry in sidebar
+  const hasResolvedJoin = useRef(false);
+  useEffect(() => {
+    if (!joinCode || !session?.user || hasResolvedJoin.current) return;
+    hasResolvedJoin.current = true;
+
+    const resolve = async () => {
+      console.log('[joinCode] resolving:', joinCode);
+      sessionStorage.removeItem('pendingJoinCode');
+
+      const { data: invite, error: invErr } = await supabase
+        .from('invites')
+        .select('room_id, rooms(name, icon, is_private)')
+        .eq('link', joinCode)
+        .single();
+
+      console.log('[joinCode] invite:', invite, invErr);
+      if (!invite) return;
+      if (invite.rooms?.is_private) return;
+
+      const roomId = invite.room_id;
+
+      const { data: membership, error: memErr } = await supabase
+        .from('room_users')
+        .select('room_id')
+        .eq('UID', session.user.id)
+        .eq('room_id', roomId)
+        .maybeSingle();
+
+      console.log('[joinCode] membership:', membership, memErr);
+      if (membership) {
+        setSelectedRoomId(roomId);
+      } else {
+        setPendingRoom({
+          id: roomId,
+          name: invite.rooms?.name ?? 'Unnamed room',
+          icon: REVERSE_ICON_MAP[invite.rooms?.icon] || 'link',
+          code: joinCode,
+        });
+        setSelectedRoomId(roomId);
+      }
+    };
+
+    resolve();
+  }, [joinCode, session])
+
   async function createRoomsDB(room_name, iconId, private_status = false){
     if (!session?.user) {
       console.error("No active session found.");
@@ -136,6 +183,20 @@ export default function Dashboard({session ,callback}) {
     } catch (err) {
       console.error("Failed to leave room:", err);
     }
+  }
+
+  async function joinPendingRoom() {
+    if (!pendingRoom) return;
+    await joinRoomDB(pendingRoom.code);
+    // joinRoomDB adds the room to state; clear pending and keep it selected
+    setRooms(prev => {
+      const already = prev.find(r => r.id === pendingRoom.id);
+      if (!already) {
+        return [...prev, { id: pendingRoom.id, name: pendingRoom.name, icon: pendingRoom.icon }];
+      }
+      return prev;
+    });
+    setPendingRoom(null);
   }
 
   async function joinRoomDB(code) {
@@ -217,7 +278,7 @@ export default function Dashboard({session ,callback}) {
         
         <div className="hidden lg:flex lg:flex-none h-full relative" style={{ width: sidebarWidth }}>
           <div className="w-full h-full">
-            <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} openPopup={() => setShowRoomPopup(true)} />
+            <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} openPopup={() => setShowRoomPopup(true)} pendingRoom={pendingRoom} onJoinPending={joinPendingRoom} />
           </div>
           {/* Resize handle */}
           <div
@@ -240,11 +301,11 @@ export default function Dashboard({session ,callback}) {
             </svg>
           </button>
 
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} />
+          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} pendingRoom={pendingRoom} onJoinPending={joinPendingRoom} />
         </div>
         
         <div className="flex-1 min-w-0 h-full overflow-hidden lg:rounded-l-2xl">
-          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} readOnly={!!pendingRoom && selectedRoomId === pendingRoom.id} />
         </div>
       </div>
     </>

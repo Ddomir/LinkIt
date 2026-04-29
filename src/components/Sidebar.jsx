@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import CreateRoomPopup from "./popups/CreateRoomPopup";
 import { DynamicIcon } from 'lucide-react/dynamic';
 import Toggle from "./Toggle";
+import ConfirmPopup from "./popups/ConfirmPopup";
 
 function RoomIcon({ icon, className = "w-4 h-4" }) {
     const iconObj = typeof icon === 'number'
@@ -11,11 +12,12 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
     return <span className={className}>{iconObj.svg}</span>;
 }
 
-export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom, openPopup}) {
+export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom, openPopup, pendingRoom, onJoinPending}) {
     const [showPopup, setShowPopup] = useState(false)
     const [openMenuId, setOpenMenuId] = useState(null)
     const [leaveMode, setLeaveMode] = useState(false)
     const [visible, setVisible] = useState(Boolean(isOpen))
+    const [leaveConfirm, setLeaveConfirm] = useState(null) // room id to confirm leaving
 
     const isMobile = typeof isOpen === 'boolean'
 
@@ -55,6 +57,19 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
             {/* Room list */}
             <div className="flex-1 overflow-auto px-3 py-1 scrollbar-thin">
                 <div className="flex flex-col gap-1">
+                    {pendingRoom && (
+                        <div className="relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium border border-dashed border-white/20 text-white/50">
+                            <DynamicIcon name={pendingRoom.icon} color="currentColor" size={24} strokeWidth={2} />
+                            <span className="truncate flex-1">{pendingRoom.name}</span>
+                            <button
+                                onClick={onJoinPending}
+                                className="shrink-0 text-xs font-semibold px-2 py-1 rounded-lg bg-[#77f298] text-black hover:bg-[#5ee07e] transition-colors cursor-pointer"
+                            >
+                                Join
+                            </button>
+                        </div>
+                    )}
+
                     {rooms.map(room => (
                         <div key={room.id} className="relative group">
                             <button
@@ -69,7 +84,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                             {/* Mobile leave mode: minus button */}
                             {isMobile && leaveMode && (
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); onLeaveRoom && onLeaveRoom(room.id); }}
+                                    onClick={(e) => { e.stopPropagation(); setLeaveConfirm(room.id); }}
                                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors"
                                     aria-label="Leave room"
                                 >
@@ -96,7 +111,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                                     {openMenuId === room.id && (
                                         <div className="absolute right-0 top-full mt-1 z-50 surface border border-white/10 rounded-xl shadow-xl overflow-hidden">
                                             <button
-                                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); onLeaveRoom && onLeaveRoom(room.id); }}
+                                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); setLeaveConfirm(room.id); }}
                                                 className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
                                             >
                                                 Leave room
@@ -138,6 +153,15 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                     </svg>
                 </button>
             </div>
+
+            <ConfirmPopup
+                isOpen={!!leaveConfirm}
+                title="Leave room?"
+                message="You'll need the invite code to rejoin."
+                confirmLabel="Leave"
+                onConfirm={() => { onLeaveRoom && onLeaveRoom(leaveConfirm); setLeaveConfirm(null); }}
+                onCancel={() => setLeaveConfirm(null)}
+            />
         </div>
     )
 
