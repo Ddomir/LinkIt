@@ -169,8 +169,8 @@ export default function Dashboard({session, callback, joinCode}) {
     try {
       const newRoom = await createRoom(user.id, room_name, private_status, iconId);
 
-      await createInvite(newRoom.id);
       await createRoomUser(user.id, newRoom.id, 10); // 10 is the role id for owner!
+      await createInvite(newRoom.id);
 
       //UI update
       const formattedNewRoom = {
