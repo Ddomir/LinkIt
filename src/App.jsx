@@ -22,9 +22,9 @@ function App() {
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      // options: {
-      //   redirectTo: import.meta.env.VITE_REDIRECT_URL
-      // },
+      options: {
+        redirectTo: import.meta.env.VITE_REDIRECT_URL
+      },
     });
     
     if (error) alert(error.message);
