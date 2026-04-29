@@ -34,8 +34,8 @@ export default function CreateRoomPopup({ isOpen, onClose, onCreate, onJoin }) {
     };
 
     const handleJoin = () => {
-        //close popup and reset room code input (temp)
         onJoin(roomCode);
+        setRoomCode("");
     };
 
     return (

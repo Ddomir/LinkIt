@@ -167,7 +167,7 @@ export default function Dashboard({session, callback, joinCode}) {
       };
 
       setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
-      //setRooms((prevRooms) => [...prevRooms, newRoom]);
+      return formattedNewRoom;
     } catch (err) {
       console.error("Failed to create room:", err);
     }
@@ -234,7 +234,7 @@ export default function Dashboard({session, callback, joinCode}) {
       };
 
       setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
-      //setRooms((prevRooms) => [...prevRooms, newRoom]);
+      return formattedNewRoom;
     } catch (err) {
       console.error("Failed to join room: see error message", err);
     }
@@ -272,8 +272,8 @@ export default function Dashboard({session, callback, joinCode}) {
         <CreateRoomPopup
           isOpen={showRoomPopup}
           onClose={() => { setShowRoomPopup(false); setJoinError(null); }}
-          onCreate={({ name, icon }) => { createRoomsDB(name, icon); setShowRoomPopup(false); }}
-          onJoin={joinRoomDB}
+          onCreate={async ({ name, icon }) => { const room = await createRoomsDB(name, icon); setShowRoomPopup(false); if (room?.id) setSelectedRoomId(room.id); }}
+          onJoin={async (code) => { const room = await joinRoomDB(code); if (room?.id) { setShowRoomPopup(false); setSelectedRoomId(room.id); } }}
         />
         
         <div className="hidden lg:flex lg:flex-none h-full relative" style={{ width: sidebarWidth }}>
