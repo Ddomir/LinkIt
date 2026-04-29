@@ -75,7 +75,7 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                             <button
                                 onClick={() => { onSelectRoom(room.id); setOpenMenuId(null); setLeaveMode(false); onClose?.(); }}
                                 className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
-                                    ${selectedRoomId === room.id ? 'accent text-[var(--accent-foreground)]' : 'hover:opacity-90'}`}
+                                    ${selectedRoomId === room.id ? 'accent text-(--accent-foreground)' : 'hover:opacity-90'}`}
                             >
                                 <DynamicIcon name={room.icon} color="currentColor" size={24} strokeWidth={2} />
                                 <span className="truncate">{room.name}</span>

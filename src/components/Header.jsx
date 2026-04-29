@@ -4,7 +4,7 @@ import ShareInvite from "./popups/ShareInvite";
 import Search from "./Search";
 import { Share2, Plus, SquareArrowRightExit } from "lucide-react";
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false }) {
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false, mobileOpen = false, onHamburgerClick }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [showInvitePopup, setInvitePopup] = useState(false);
 
@@ -15,31 +15,63 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
         setShowLinkPopup(false);
     };
 
-    
-
     return (
-        <div className="flex flex-col justify-between px-3 py-3 w-full">
+        <>
+        {/* Mobile header: sticky, transparent with bottom gradient fade */}
+        <div className="sm:hidden sticky top-0 z-50 pointer-events-none">
+            <div className="absolute inset-0 bg-linear-to-b from-[#0E100E] via-[#0E100E]/80 to-transparent" />
+            <div className="relative pointer-events-auto flex items-center justify-between px-3 pt-3 pb-6">
+                {/* Spacer to balance the right-side actions */}
+                <div className="w-10" />
 
+                {/* Centered room name */}
+                <h1 className="text-(--accent) text-2xl font-bold text-center absolute left-1/2 -translate-x-1/2">{roomData.name}</h1>
+
+                {/* Right actions */}
+                {!readOnly ? (
+                    <div className="flex items-center gap-1">
+                        <button
+                            className="text-white hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
+                            aria-label="Share invite"
+                            onClick={() => setInvitePopup(true)}
+                        >
+                            <Share2 size={20} strokeWidth={2.5} />
+                        </button>
+                        <button
+                            onClick={() => setShowLinkPopup(true)}
+                            aria-label="Add link or folder"
+                            className="flex items-center justify-center bg-(--accent) text-black rounded-full w-8 h-8 shadow-lg hover:bg-[#5fd980] cursor-pointer transition-colors duration-150"
+                        >
+                            <Plus size={18} strokeWidth={3} />
+                        </button>
+                    </div>
+                ) : (
+                    <div className="w-10" />
+                )}
+            </div>
+        </div>
+
+        {/* Desktop header */}
+        <div className="hidden sm:flex flex-col justify-between px-3 py-3 w-full">
             <div className="w-full flex flex-col gap-2">
-                <div className="flex items-center justify-center sm:justify-between gap-2">
-                    <h1 className="text-(--accent) text-3xl sm:text-4xl font-bold text-center sm:text-left pl-3">{roomData.name}</h1>
+                <div className="flex items-center justify-between gap-2">
+                    <h1 className="text-(--accent) text-4xl font-bold text-left pl-3">{roomData.name}</h1>
 
                     {!readOnly && (
-                    <div className="hidden sm:flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3">
                         <button
                             className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
                             aria-label="Share invite"
                             onClick={() => setInvitePopup(true)}
                         >
-                            <Share2 strokeWidth={2.5}  />
+                            <Share2 strokeWidth={2.5} />
                         </button>
-
-                       <button
+                        <button
                             onClick={() => setShowLinkPopup(true)}
                             aria-label="Add link or folder"
                             className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
                         >
-                            <Plus size={28} strokeWidth={3}  />
+                            <Plus size={28} strokeWidth={3} />
                         </button>
                     </div>
                     )}
@@ -47,56 +79,44 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
 
                 <div className="w-full flex items-center justify-between gap-3">
                     <div className="w-full sm:w-1/2">
-                            <Search
-                                searchQuery={searchQuery}
-                                onSearchChange={setSearchQuery}
-                                filters={filters}
-                                onFilterChange={setFilters}
-                                sortOption={sortOption}
-                                onSortChange={setSortOption}
-                                viewMode={viewMode}
-                                setViewMode={setViewMode}
-                            />
-                        </div>
-
+                        <Search
+                            searchQuery={searchQuery}
+                            onSearchChange={setSearchQuery}
+                            filters={filters}
+                            onFilterChange={setFilters}
+                            sortOption={sortOption}
+                            onSortChange={setSortOption}
+                            viewMode={viewMode}
+                            setViewMode={setViewMode}
+                        />
+                    </div>
                 </div>
             </div>
-
-            {/* Mobile floating buttons: fixed bottom-right on small screens */}
-            {!readOnly && (
-            <div className="sm:hidden fixed right-4 bottom-6 flex flex-row gap-3 z-50">
-                <button
-                    className="text-[#ffffff] hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
-                    aria-label="Share invite"
-                    onClick={() => setInvitePopup(true)}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
-                    </svg>
-                </button>
-
-                <button
-                    onClick={() => setShowLinkPopup(true)}
-                    aria-label="Add link or folder"
-                    className="flex items-center justify-center bg-(--accent) text-black rounded-full w-10 h-10 shadow-lg hover:bg-[#5fd980] hover:cursor-pointer transition-colors duration-150"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5">
-                        <path d="M10 4a1 1 0 011 1v4h4a1 1 0 110 2h-4v4a1 1 0 11-2 0v-4H5a1 1 0 110-2h4V5a1 1 0 011-1z" />
-                    </svg>
-                </button>
-            </div>
-            )}
-
-            <CreateLinkPopup
-                COLOR_OPTIONS={COLOR_OPTIONS}
-                isOpen={showLinkPopup}
-                onClose={() => setShowLinkPopup(false)}
-                onCreate={handleCreateLink}
-                selectedFolder={selectedFolder}
-            />
-
-            <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
-
         </div>
+
+        {/* Mobile search bar (below the sticky header, scrolls with content) */}
+        <div className="sm:hidden px-3 pb-3">
+            <Search
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                filters={filters}
+                onFilterChange={setFilters}
+                sortOption={sortOption}
+                onSortChange={setSortOption}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+            />
+        </div>
+
+        <CreateLinkPopup
+            COLOR_OPTIONS={COLOR_OPTIONS}
+            isOpen={showLinkPopup}
+            onClose={() => setShowLinkPopup(false)}
+            onCreate={handleCreateLink}
+            selectedFolder={selectedFolder}
+        />
+
+        <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
+        </>
     )
 }

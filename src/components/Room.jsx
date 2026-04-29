@@ -7,7 +7,7 @@ import { getFoldersByRoomId, getSubfoldersByFolderId, createFolder, updateFolder
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false }) {
+export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false, mobileOpen = false, onHamburgerClick }) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -357,6 +357,8 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
         setViewMode={setViewMode}
         selectedFolder={selectedFolder}
         readOnly={readOnly}
+        mobileOpen={mobileOpen}
+        onHamburgerClick={onHamburgerClick}
       />
       {folderStack.length > 0 && (
         <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/10 text-sm flex-wrap">

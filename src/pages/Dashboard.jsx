@@ -289,23 +289,25 @@ export default function Dashboard({session, callback, joinCode}) {
           </div>
         </div>
 
-        {/* Mobile hamburger — fixed, only visible when sheet is closed */}
         <div className="md:hidden">
-          <button
-            className={`m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2 transition-all duration-300 ${mobileOpen ? 'opacity-0 pointer-events-none translate-y-2' : 'opacity-100 translate-y-0'}`}
-            aria-label="Open menu"
-            onClick={() => setMobileOpen(true)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} pendingRoom={pendingRoom} onJoinPending={joinPendingRoom} />
         </div>
+
+        {/* Mobile hamburger — fixed above all stacking contexts */}
+        <button
+          className={`md:hidden fixed top-3 left-3 z-60 p-2 rounded-md cursor-pointer transition-colors duration-300 ${mobileOpen ? 'bg-[#77f298] text-black' : 'text-white'}`}
+          onClick={() => setMobileOpen(o => !o)}
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            {mobileOpen
+              ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />}
+          </svg>
+        </button>
         
         <div className="flex-1 min-w-0 h-full overflow-hidden lg:rounded-l-2xl">
-          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} readOnly={!!pendingRoom && selectedRoomId === pendingRoom.id} />
+          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} readOnly={!!pendingRoom && selectedRoomId === pendingRoom.id} mobileOpen={mobileOpen} onHamburgerClick={() => setMobileOpen(o => !o)} />
         </div>
       </div>
     </>
