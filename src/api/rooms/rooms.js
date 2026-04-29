@@ -23,7 +23,7 @@ export async function getRoomById(id) {
 export async function fetchRooms(UUID) {
   const { data, error } = await supabase
     .from('room_users')
-    .select('rooms!inner (*)')
+    .select('role, rooms!inner (*)')
     .eq('UID', UUID)
 
     //Catches errors
@@ -116,6 +116,14 @@ export async function updatePrivateStatus(id, private_status) {
         console.log("✅ Update Success! Data:", data);
     }
     return data
+}
+
+export async function deleteRoom(id) {
+    const { error } = await supabase
+        .from('rooms')
+        .delete()
+        .eq('id', id)
+    if (error) throw error
 }
 
 /**

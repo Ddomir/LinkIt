@@ -7,7 +7,11 @@ import { getFoldersByRoomId, getSubfoldersByFolderId, createFolder, updateFolder
 import { getRoomById } from "../api/rooms/rooms";
 import { supabase } from "../supabaseClient";
 
-export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false, mobileOpen = false, onHamburgerClick }) {
+export const ROLE_VIEWER = 8;
+export const ROLE_EDITOR = 9;
+export const ROLE_OWNER  = 10;
+
+export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, onRoomDeleted, onRoomRenamed, currentUserId = null, pendingRoom = null, onJoinPending }) {
   const [showInvitePopup, setInvitePopup] = useState(false);
   const [roomData, setRoomData] = useState({ name: "", links: {} });
   const [inviteData, setInviteData] = useState(null);
@@ -154,6 +158,18 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
     };
 
     fetchRoomContent();
+  }, [roomId]);
+
+  // Real-time: if this room gets deleted, force the user back to no-room
+  useEffect(() => {
+    if (!roomId) return;
+    const channel = supabase
+      .channel(`room-deleted-${roomId}`)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` }, () => {
+        onRoomDeleted?.(roomId);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [roomId]);
 
   const addCardToRoom = async (data) => {
@@ -336,6 +352,35 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
     );
   }
 
+  // Expired invite — show message, no join option
+  if (pendingRoom && pendingRoom.id === roomId && pendingRoom.expired) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 app-bg room-panel overflow-hidden lg:rounded-l-2xl px-6 text-center">
+        <p className="text-[#77f298] text-2xl font-bold">{pendingRoom.name}</p>
+        <p className="text-white/50 text-sm max-w-xs">This invite link has expired. Ask the room owner for a new one.</p>
+      </div>
+    );
+  }
+
+  // Private room the user hasn't joined yet — show join gate instead of empty content
+  if (readOnly && pendingRoom && pendingRoom.id === roomId && pendingRoom.isPrivate) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 app-bg room-panel overflow-hidden lg:rounded-l-2xl px-6 text-center">
+        <p className="text-[#77f298] text-2xl font-bold">{pendingRoom.name}</p>
+        <p className="text-white/50 text-sm max-w-xs">This is a private room. You won't be able to see any content until you join.</p>
+        <button
+          onClick={onJoinPending}
+          className="mt-2 px-8 py-2.5 rounded-full bg-[#77f298] text-black font-semibold hover:bg-[#5ee07e] transition-colors cursor-pointer"
+        >
+          Join Room
+        </button>
+      </div>
+    );
+  }
+
+  // For public rooms everyone can edit; for private rooms need Editor or Owner role
+  const canEdit = !readOnly && (!isPrivateRoom || (userRole !== null && userRole >= ROLE_EDITOR));
+
   return (
     <div className="w-full h-full flex flex-col app-bg room-panel overflow-hidden lg:rounded-l-2xl">
       <EditCardPopup
@@ -346,7 +391,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
         COLOR_OPTIONS={COLOR_OPTIONS}
       />
       <div className="relative z-10 flex flex-col flex-1 min-h-0">
-      <Header roomData={roomData} inviteData={inviteData} onAddCard={readOnly ? null : addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS}
+      <Header roomData={roomData} inviteData={inviteData} onAddCard={canEdit ? addCardToRoom : null} COLOR_OPTIONS={COLOR_OPTIONS}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filters={filters}
@@ -359,7 +404,25 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
         readOnly={readOnly}
         mobileOpen={mobileOpen}
         onHamburgerClick={onHamburgerClick}
+        userRole={userRole}
+        isPrivateRoom={isPrivateRoom}
+        currentUserId={currentUserId}
+        roomId={roomId}
+        onRoomDeleted={onRoomDeleted}
+        onRoomRenamed={onRoomRenamed}
+        onInviteRegenerated={setInviteData}
       />
+      {readOnly && pendingRoom && pendingRoom.id === roomId && !pendingRoom.isPrivate && (
+        <div className="mx-4 mb-2 flex items-center justify-between gap-3 rounded-xl border border-[#77f298]/30 bg-[#77f298]/10 px-4 py-3">
+          <p className="text-sm text-[#77f298]">You're previewing this room. Join to save and add links.</p>
+          <button
+            onClick={onJoinPending}
+            className="shrink-0 px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#77f298] text-black hover:bg-[#5ee07e] transition-colors cursor-pointer"
+          >
+            Join
+          </button>
+        </div>
+      )}
       {folderStack.length > 0 && (
         <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/10 text-sm flex-wrap">
           {/* Back chevron — always goes up one level */}
@@ -415,8 +478,8 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
             sortOption={sortOption}
             viewMode={viewMode}
             onFolderClick={openFolder}
-            onEdit={readOnly ? null : setEditItem}
-            onDelete={readOnly ? null : (id, type) => deleteCard(id, type)}
+            onEdit={canEdit ? setEditItem : null}
+            onDelete={canEdit ? (id, type) => deleteCard(id, type) : null}
           />
         </div>
       </div>

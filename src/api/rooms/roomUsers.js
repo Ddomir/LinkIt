@@ -2,26 +2,18 @@ import { supabase } from '../../supabaseClient'
 import { inviteCodeExists } from "../invites";
 
 export async function createRoomUser(user_id, room_id, role){
-    console.log("Attempting to insert: ", user_id);
-
-    const { data, error } = await supabase
+    const { error } = await supabase
         .from('room_users')
-        .insert({ 
+        .insert({
             room_id: room_id,
             UID: user_id,
             role: role,
         })
-        .select()
-        .single()
-    
-    //Catches errors
+
     if(error){
         console.error("❌ Insert Failed:", error.message);
         throw error;
-    }else{
-        console.log("✅ Insert Success! Data:", data);
     }
-    return data
 }
 
 async function userInRoom(user_id, room_id) {
@@ -34,6 +26,45 @@ async function userInRoom(user_id, room_id) {
     if (error) throw error
 
     return (data.length != 0); 
+}
+
+export async function getUserRole(user_id, room_id) {
+    const { data, error } = await supabase
+        .from('room_users')
+        .select('role')
+        .eq('UID', user_id)
+        .eq('room_id', room_id)
+        .single()
+    if (error) return null
+    return data.role
+}
+
+export async function getRoomMembers(room_id) {
+    const { data: members, error } = await supabase
+        .from('room_users')
+        .select('UID, role')
+        .eq('room_id', room_id)
+    if (error) throw error
+
+    const uids = members.map(m => m.UID)
+    const { data: users } = await supabase
+        .from('users')
+        .select('UUID, name, email')
+        .in('UUID', uids)
+
+    const userMap = {}
+    ;(users ?? []).forEach(u => { userMap[u.UUID] = u })
+
+    return members.map(m => ({ ...m, users: userMap[m.UID] ?? null }))
+}
+
+export async function updateUserRole(user_id, room_id, role) {
+    const { error } = await supabase
+        .from('room_users')
+        .update({ role })
+        .eq('UID', user_id)
+        .eq('room_id', room_id)
+    if (error) throw error
 }
 
 export async function removeRoomUser(user_id, room_id) {
@@ -61,6 +92,6 @@ export async function joinRoom(user_id, code) {
     }
 
     // if all checks pass, join the room as a VIEWER (id: 8)
-    createRoomUser(user_id, room.id, 8);
+    await createRoomUser(user_id, room.id, 8);
     return room;
 }

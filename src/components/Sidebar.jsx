@@ -55,12 +55,14 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                         <div className="relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium border border-dashed border-white/20 text-white/50">
                             <DynamicIcon name={pendingRoom.icon} color="currentColor" size={24} strokeWidth={2} />
                             <span className="truncate flex-1">{pendingRoom.name}</span>
-                            <button
-                                onClick={onJoinPending}
-                                className="shrink-0 text-xs font-semibold px-2 py-1 rounded-lg bg-[#77f298] text-black hover:bg-[#5ee07e] transition-colors cursor-pointer"
-                            >
-                                Join
-                            </button>
+                            {!pendingRoom.expired && (
+                                <button
+                                    onClick={onJoinPending}
+                                    className="shrink-0 text-xs font-semibold px-2 py-1 rounded-lg bg-[#77f298] text-black hover:bg-[#5ee07e] transition-colors cursor-pointer"
+                                >
+                                    Join
+                                </button>
+                            )}
                         </div>
                     )}
 

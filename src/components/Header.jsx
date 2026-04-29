@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import CreateLinkPopup from "./popups/CreateLinkPopup";
-import ShareInvite from "./popups/ShareInvite";
+import RoomSettingsPopup from "./popups/RoomSettingsPopup";
 import Search from "./Search";
-import { Share2, Plus, SquareArrowRightExit } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 
-export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false, mobileOpen = false, onHamburgerClick }) {
+const ROLE_OWNER = 10;
+
+export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS, searchQuery, setSearchQuery, filters, setFilters, sortOption, setSortOption, viewMode, setViewMode, selectedFolder, readOnly = false, mobileOpen = false, onHamburgerClick, userRole = null, isPrivateRoom = false, currentUserId = null, roomId, onRoomDeleted, onRoomRenamed, onInviteRegenerated }) {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
-    const [showInvitePopup, setInvitePopup] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
 
     const handleCreateLink = (data) => {
-        if (onAddCard && data) {
-            onAddCard(data);
-        }
+        if (onAddCard && data) onAddCard(data);
         setShowLinkPopup(false);
     };
+
+    const isOwner = userRole === ROLE_OWNER;
+    const canAdd = !!onAddCard;
 
     return (
         <>
@@ -21,7 +24,7 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
         <div className="sm:hidden sticky top-0 z-50 pointer-events-none">
             <div className="absolute inset-0 bg-linear-to-b from-[#0E100E] via-[#0E100E]/80 to-transparent" />
             <div className="relative pointer-events-auto flex items-center justify-between px-3 pt-3 pb-6">
-                {/* Spacer to balance the right-side actions */}
+                {/* Spacer matching hamburger width in Dashboard */}
                 <div className="w-10" />
 
                 {/* Centered room name — shrinks to fit one line */}
@@ -30,20 +33,25 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                 {/* Right actions */}
                 {!readOnly ? (
                     <div className="flex items-center gap-1">
-                        <button
-                            className="text-white hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
-                            aria-label="Share invite"
-                            onClick={() => setInvitePopup(true)}
-                        >
-                            <Share2 size={20} strokeWidth={2.5} />
-                        </button>
-                        <button
-                            onClick={() => setShowLinkPopup(true)}
-                            aria-label="Add link or folder"
-                            className="flex items-center justify-center bg-(--accent) text-black rounded-full w-8 h-8 shadow-lg hover:bg-[#5fd980] cursor-pointer transition-colors duration-150"
-                        >
-                            <Plus size={18} strokeWidth={3} />
-                        </button>
+                        {isOwner && (
+                            <button
+                                className="text-white hover:text-(--accent) cursor-pointer transition-colors duration-150 p-2"
+                                aria-label="Room settings"
+                                onClick={() => setShowSettings(true)}
+                            >
+                                <Settings size={20} strokeWidth={2} />
+                            </button>
+                        )}
+                        {canAdd && (
+                            <button
+                                onClick={() => setShowLinkPopup(true)}
+                                aria-label="Add link or folder"
+                                className="flex items-center justify-center bg-(--accent) text-black rounded-full w-8 h-8 shadow-lg hover:bg-[#5fd980] cursor-pointer transition-colors duration-150"
+                            >
+                                <Plus size={18} strokeWidth={3} />
+                            </button>
+                        )}
+                        {!isOwner && !canAdd && <div className="w-10" />}
                     </div>
                 ) : (
                     <div className="w-10" />
@@ -58,21 +66,25 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
                     <h1 className="text-(--accent) text-4xl font-bold text-left pl-3">{roomData.name}</h1>
 
                     {!readOnly && (
-                    <div className="flex items-center justify-between gap-3">
-                        <button
-                            className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
-                            aria-label="Share invite"
-                            onClick={() => setInvitePopup(true)}
-                        >
-                            <Share2 strokeWidth={2.5} />
-                        </button>
-                        <button
-                            onClick={() => setShowLinkPopup(true)}
-                            aria-label="Add link or folder"
-                            className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
-                        >
-                            <Plus size={28} strokeWidth={3} />
-                        </button>
+                    <div className="flex items-center gap-2">
+                        {isOwner && (
+                            <button
+                                className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                                aria-label="Room settings"
+                                onClick={() => setShowSettings(true)}
+                            >
+                                <Settings size={22} strokeWidth={2} />
+                            </button>
+                        )}
+                        {canAdd && (
+                            <button
+                                onClick={() => setShowLinkPopup(true)}
+                                aria-label="Add link or folder"
+                                className="hover:bg-(--accent) text-(--text) hover:text-black hover:cursor-pointer rounded-full p-2 transition-colors duration-150"
+                            >
+                                <Plus size={28} strokeWidth={3} />
+                            </button>
+                        )}
                     </div>
                     )}
                 </div>
@@ -116,7 +128,18 @@ export default function Header({ roomData, inviteData, onAddCard, COLOR_OPTIONS,
             selectedFolder={selectedFolder}
         />
 
-        <ShareInvite isOpen={showInvitePopup} onClose={() => setInvitePopup(false)} inviteData={inviteData} />
+        <RoomSettingsPopup
+            isOpen={showSettings}
+            onClose={() => setShowSettings(false)}
+            roomId={roomId}
+            roomName={roomData.name}
+            isPrivate={isPrivateRoom}
+            inviteData={inviteData}
+            currentUserId={currentUserId}
+            onRoomDeleted={onRoomDeleted}
+            onRoomRenamed={(id, newName) => { onRoomRenamed?.(id, newName); setShowSettings(false); }}
+            onInviteRegenerated={onInviteRegenerated}
+        />
         </>
     )
 }

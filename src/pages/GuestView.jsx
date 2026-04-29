@@ -18,11 +18,12 @@ export default function GuestView({ inviteCode, onLogin }) {
       try {
         const { data: invite, error } = await supabase
           .from("invites")
-          .select("room_id, rooms(is_private)")
+          .select("room_id, expires_at, rooms(is_private)")
           .eq("link", inviteCode)
           .single();
 
         if (error || !invite) { setStatus("notfound"); return; }
+        if (invite.expires_at && new Date(invite.expires_at) < new Date()) { setStatus("expired"); return; }
         if (invite.rooms?.is_private) { setStatus("private"); return; }
 
         setRoomId(invite.room_id);
@@ -51,6 +52,15 @@ export default function GuestView({ inviteCode, onLogin }) {
     return (
       <div className="w-screen h-screen flex items-center justify-center app-bg">
         <p className="text-[#77f298] text-xl">Loading…</p>
+      </div>
+    );
+  }
+
+  if (status === "expired") {
+    return (
+      <div className="w-screen h-screen flex flex-col items-center justify-center gap-4 app-bg room-panel">
+        <p className="text-white/60 text-xl">This invite link has expired.</p>
+        <p className="text-white/30 text-sm">Ask the room owner for a new link.</p>
       </div>
     );
   }

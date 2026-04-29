@@ -1,15 +1,18 @@
 import Sidebar from '../components/Sidebar'
 import Room from '../components/Room'
-import { createRoom, fetchRooms } from '../api/rooms/rooms'
+import { createRoom, fetchRooms, deleteRoom } from '../api/rooms/rooms'
 import { getLinksByRoomId } from '../api/links'
-import { createRoomUser, joinRoom } from '../api/rooms/roomUsers'
+import { createRoomUser, joinRoom, removeRoomUser } from '../api/rooms/roomUsers'
 import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
-import {useState, useEffect, useRef, useCallback, createContext} from 'react'
+import {useState, useEffect, useRef, useCallback} from 'react'
 import { getColors } from '../api/colors'
 import CreateRoomPopup from '../components/popups/CreateRoomPopup'
-import { removeRoomUser } from "../api/rooms/roomUsers";
 import { supabase } from '../supabaseClient';
+
+export const ROLE_VIEWER = 8;
+export const ROLE_EDITOR = 9;
+export const ROLE_OWNER = 10;
 
 
 const REVERSE_ICON_MAP = {
@@ -67,9 +70,11 @@ export default function Dashboard({session, callback, joinCode}) {
         const formattedRooms = [];
         data.map( (arr) => {
           formattedRooms.push({
-            id: arr.rooms.id, 
+            id: arr.rooms.id,
             name: arr.rooms.name,
-            icon: REVERSE_ICON_MAP[arr.rooms.icon] || 'x' 
+            icon: REVERSE_ICON_MAP[arr.rooms.icon] || 'x',
+            role: arr.role,
+            isPrivate: arr.rooms.is_private,
           });
         });
 
@@ -109,15 +114,25 @@ export default function Dashboard({session, callback, joinCode}) {
       console.log('[joinCode] resolving:', joinCode);
       sessionStorage.removeItem('pendingJoinCode');
 
-      const { data: invite, error: invErr } = await supabase
+      const { data: invite } = await supabase
         .from('invites')
-        .select('room_id, rooms(name, icon, is_private)')
+        .select('room_id, expires_at, rooms(name, icon, is_private)')
         .eq('link', joinCode)
-        .single();
+        .maybeSingle();
 
-      console.log('[joinCode] invite:', invite, invErr);
       if (!invite) return;
-      if (invite.rooms?.is_private) return;
+      if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
+        setPendingRoom({
+          id: invite.room_id,
+          name: invite.rooms?.name ?? 'Unknown room',
+          icon: REVERSE_ICON_MAP[invite.rooms?.icon] || 'link',
+          code: joinCode,
+          isPrivate: invite.rooms?.is_private ?? false,
+          expired: true,
+        });
+        setSelectedRoomId(invite.room_id);
+        return;
+      }
 
       const roomId = invite.room_id;
 
@@ -137,6 +152,7 @@ export default function Dashboard({session, callback, joinCode}) {
           name: invite.rooms?.name ?? 'Unnamed room',
           icon: REVERSE_ICON_MAP[invite.rooms?.icon] || 'link',
           code: joinCode,
+          isPrivate: invite.rooms?.is_private ?? false,
         });
         setSelectedRoomId(roomId);
       }
@@ -163,7 +179,9 @@ export default function Dashboard({session, callback, joinCode}) {
       const formattedNewRoom = {
         id: newRoom.id,
         name: newRoom.name,
-        icon: REVERSE_ICON_MAP[newRoom.icon] || 'star'
+        icon: REVERSE_ICON_MAP[newRoom.icon] || 'star',
+        role: ROLE_OWNER,
+        isPrivate: newRoom.is_private,
       };
 
       setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
@@ -185,18 +203,35 @@ export default function Dashboard({session, callback, joinCode}) {
     }
   }
 
+  async function deleteRoomDB(room_id) {
+    try {
+      await deleteRoom(room_id);
+      setRooms((prev) => prev.filter(r => r.id !== room_id));
+      if (selectedRoomId === room_id) setSelectedRoomId(null);
+    } catch (err) {
+      console.error("Failed to delete room:", err);
+    }
+  }
+
+  function renameRoomLocal(room_id, newName) {
+    setRooms(prev => prev.map(r => r.id === room_id ? { ...r, name: newName } : r));
+  }
+
   async function joinPendingRoom() {
     if (!pendingRoom) return;
     await joinRoomDB(pendingRoom.code);
-    // joinRoomDB adds the room to state; clear pending and keep it selected
+    const roomId = pendingRoom.id;
     setRooms(prev => {
-      const already = prev.find(r => r.id === pendingRoom.id);
+      const already = prev.find(r => r.id === roomId);
       if (!already) {
-        return [...prev, { id: pendingRoom.id, name: pendingRoom.name, icon: pendingRoom.icon }];
+        return [...prev, { id: roomId, name: pendingRoom.name, icon: pendingRoom.icon, role: ROLE_VIEWER, isPrivate: pendingRoom.isPrivate ?? false }];
       }
-      return prev;
+      return prev.map(r => r.id === roomId ? { ...r, role: ROLE_VIEWER } : r);
     });
     setPendingRoom(null);
+    // Force Room to re-fetch by briefly clearing then restoring the selected room
+    setSelectedRoomId(null);
+    setTimeout(() => setSelectedRoomId(roomId), 0);
   }
 
   async function joinRoomDB(code) {
@@ -206,31 +241,28 @@ export default function Dashboard({session, callback, joinCode}) {
     }
     const { user } = session;
     setJoinError(null);
-    
+
     try {
       const newRoom = await joinRoom(user.id, code);
-      
+
       if (newRoom.err) {
         console.error("Failed to join room: see error message");
-        // todo handle displaying
-        if (newRoom.err == -1) { // -1 = code DNE
+        if (newRoom.err == -1) {
           setJoinError("The invite code <" + code + "> does not exist!");
-        }
-
-        else if (newRoom.err = -2) { // -2 = user already in room
+        } else if (newRoom.err == -2) {
           setJoinError("You are already in the room!");
         }
-        
         return;
       }
 
       console.log("User joined room ", newRoom, " successfully");
 
-      //UI update
       const formattedNewRoom = {
         id: newRoom.id,
         name: newRoom.name,
-        icon: REVERSE_ICON_MAP[newRoom.icon] || 'x'
+        icon: REVERSE_ICON_MAP[newRoom.icon] || 'x',
+        role: ROLE_VIEWER,
+        isPrivate: newRoom.is_private,
       };
 
       setRooms((prevRooms) => [...prevRooms, formattedNewRoom]);
@@ -264,8 +296,9 @@ export default function Dashboard({session, callback, joinCode}) {
       <div className="w-screen h-screen flex" style={{ background: 'var(--surface)' }}>
         { joinError &&
           <div className='bg-[#1a1a1a] rounded-2xl p-4 w-full max-w-sm shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]
-            z-1000 absolute right-0 bottom-0 text-[#ff0000] text-xl font-bold tracking-wide px-8 m-4'>
+            z-[9999] absolute right-0 bottom-0 text-[#ff0000] text-xl font-bold tracking-wide px-8 m-4 flex items-center justify-between gap-4'>
             <p>Error! {joinError}</p>
+            <button onClick={() => setJoinError(null)} className="shrink-0 text-white/40 hover:text-white transition-colors cursor-pointer text-base font-normal">✕</button>
           </div>
         }
 
@@ -307,7 +340,21 @@ export default function Dashboard({session, callback, joinCode}) {
         </button>
         
         <div className="flex-1 min-w-0 h-full overflow-hidden lg:rounded-l-2xl">
-          <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} readOnly={!!pendingRoom && selectedRoomId === pendingRoom.id} mobileOpen={mobileOpen} onHamburgerClick={() => setMobileOpen(o => !o)} />
+          <Room
+            roomId={selectedRoomId}
+            COLOR_OPTIONS={COLOR_OPTIONS}
+            openPopup={() => setShowRoomPopup(true)}
+            readOnly={!!pendingRoom && selectedRoomId === pendingRoom.id}
+            mobileOpen={mobileOpen}
+            onHamburgerClick={() => setMobileOpen(o => !o)}
+            userRole={rooms.find(r => r.id === selectedRoomId)?.role ?? null}
+            isPrivateRoom={rooms.find(r => r.id === selectedRoomId)?.isPrivate ?? false}
+            onRoomDeleted={deleteRoomDB}
+            onRoomRenamed={renameRoomLocal}
+            currentUserId={session?.user?.id}
+            pendingRoom={pendingRoom}
+            onJoinPending={joinPendingRoom}
+          />
         </div>
       </div>
     </>
