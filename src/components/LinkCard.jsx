@@ -8,10 +8,12 @@ function normalizeUrl(link) {
     return /^https?:\/\//i.test(link) ? link : `https://${link}`;
 }
 
+const FAVICON_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/favicon`;
+
 function getFaviconUrl(link) {
     try {
-        const { hostname } = new URL(normalizeUrl(link));
-        return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+        const normalized = normalizeUrl(link);
+        return `${FAVICON_PROXY}?url=${encodeURIComponent(normalized)}`;
     } catch {
         return null;
     }
