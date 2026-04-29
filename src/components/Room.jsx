@@ -299,7 +299,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
 
   if (!roomId) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center gap-4 app-bg overflow-hidden">
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 app-bg room-panel overflow-hidden lg:rounded-l-2xl">
         <p className="text-[#77f298] text-xl">Select a room to get started</p>
         <button
           onClick={openPopup}
@@ -313,14 +313,14 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center app-bg overflow-hidden">
+      <div className="w-full h-full flex items-center justify-center app-bg room-panel overflow-hidden lg:rounded-l-2xl">
         <p className="text-[#77f298] text-xl">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col app-bg overflow-hidden">
+    <div className="w-full h-full flex flex-col app-bg room-panel overflow-hidden lg:rounded-l-2xl">
       <EditCardPopup
         isOpen={!!editItem}
         onClose={() => setEditItem(null)}
@@ -328,6 +328,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
         item={editItem}
         COLOR_OPTIONS={COLOR_OPTIONS}
       />
+      <div className="relative z-10 flex flex-col flex-1 min-h-0">
       <Header roomData={roomData} inviteData={inviteData} onAddCard={addCardToRoom} COLOR_OPTIONS={COLOR_OPTIONS}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -383,6 +384,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup }) {
             onDelete={(id, type) => deleteCard(id, type)}
           />
         </div>
+      </div>
       </div>
     </div>
   );

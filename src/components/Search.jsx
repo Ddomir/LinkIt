@@ -1,14 +1,16 @@
-import React, { useState } from 'react';                // Import React library and useState hook for managing state in the component
-import { List, LayoutGrid, SearchIcon, SortDesc, Filter} from "lucide-react";
+import React, { useState, useRef, useEffect } from 'react';
+import { List, LayoutGrid, SearchIcon, SortDesc, Filter, Check } from "lucide-react";
 
 function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folders: true, links: true, pinnedOnly: false }, onFilterChange = () => {}, sortOption = 'pinned', onSortChange = () => {}, viewMode = true, setViewMode = () => {} }) {
-    const [showSort, setShowSort] = useState(false); // State to control visibility of sort options
-    const [showFilter, setShowFilter] = useState(false); // State to control visibility of filter options
+    const [showSort, setShowSort] = useState(false);
+    const [showFilter, setShowFilter] = useState(false);
+    const sortRef = useRef(null);
+    const filterRef = useRef(null);
 
     const MAX_SEARCH_LENGTH = 200;
     const NOTALLOWED_CHARS_REGEX = /[<>;`$\\{}|^~\x00-\x1F]/g;
 
-    const sanitize = (raw) => {//sanitize user input
+    const sanitize = (raw) => {
         if (typeof raw !== 'string') return '';
         let s = raw.replace(NOTALLOWED_CHARS_REGEX, '');
         s = s.replace(/\s+/g, ' ');
@@ -16,115 +18,130 @@ function Search({ searchQuery = '', onSearchChange = () => {}, filters = { folde
         s = s.trim();
         if (s.length > MAX_SEARCH_LENGTH) s = s.slice(0, MAX_SEARCH_LENGTH);
         return s;
-    }
+    };
 
-    const handleInputChange = (e) => {//when user types in the search input
-        const raw = e.target.value || '';
-        const sanitized = sanitize(raw);
-        onSearchChange(sanitized);
-    }
+    const handleInputChange = (e) => {
+        onSearchChange(sanitize(e.target.value || ''));
+    };
 
-    const handlePaste = (e) => {//when user pastes
+    const handlePaste = (e) => {
         try {
-            const clipboard = (e.clipboardData || window.clipboardData).getData('text') || '';            
-            const sanitized = sanitize(clipboard);
+            const clipboard = (e.clipboardData || window.clipboardData).getData('text') || '';
             e.preventDefault();
-            const next = sanitize((searchQuery || '') + sanitized);
-            onSearchChange(next);
-        } catch (err) {
-            //error
-        }
-    }
+            onSearchChange(sanitize((searchQuery || '') + clipboard));
+        } catch {}
+    };
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handler = (e) => {
+            if (sortRef.current && !sortRef.current.contains(e.target)) setShowSort(false);
+            if (filterRef.current && !filterRef.current.contains(e.target)) setShowFilter(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const sortOptions = [
+        { value: 'pinned', label: 'Pinned first' },
+        { value: 'az', label: 'A → Z' },
+        { value: 'za', label: 'Z → A' },
+        { value: 'newest', label: 'Newest' },
+        { value: 'oldest', label: 'Oldest' },
+    ];
+
+    const panelClass = "absolute top-full mt-2 right-0 z-50 min-w-40 bg-[#1a1d1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden";
 
     return (
-        <div className="flex gap-2 p-3 text-base justify-between items-center">
+        <div className="flex gap-2 items-center w-full">
 
-            {/* text input for searching for cards/folders */}
-            <div className="relative w-full sm:w-1/2"> 
-                <input 
-                    type="text" 
-                    placeholder="Search for links and folders..." 
-                    className="w-full h-10 px-3 pr-10 bg-(--surface) text-(--text) border border-[D9D9D9] rounded-full" 
+            {/* Search input */}
+            <div className="relative flex-1">
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full h-9 pl-4 pr-10 bg-white/5 text-(--text) border border-white/10 rounded-full text-sm placeholder:text-(--text) focus:outline-none focus:border-white/25 transition-colors"
                     value={searchQuery}
                     onChange={handleInputChange}
                     onPaste={handlePaste}
                 />
-                <SearchIcon className="absolute text-(--text) right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 sm:w-4 sm:h-4" />
+                <SearchIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
             </div>
 
-            {/* Buttons grouped to the right of the search bar */}
-            <div className="flex items-center gap-2">
-                <div className="relative">
-                    <button 
-                        onClick={() => setShowSort(!showSort)}
-                        className="flex items-center gap-2 px-3 py-2 bg-(--surface) text-(--text) rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
-                        <SortDesc className="w-6 h-6 min-w-3.5 min-h-3.5" />
-                        <span className="hidden sm:inline">Sort</span>
-                    </button>
+            {/* Sort */}
+            <div className="relative" ref={sortRef}>
+                <button
+                    onClick={() => { setShowSort(s => !s); setShowFilter(false); }}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full border transition-colors duration-150 cursor-pointer text-(--text) ${showSort ? 'bg-white/15 border-white/25' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
+                    aria-label="Sort"
+                >
+                    <SortDesc className="w-4 h-4 text-white" />
+                </button>
+                {showSort && (
+                    <div className={panelClass}>
+                        {sortOptions.map(opt => (
+                            <button
+                                key={opt.value}
+                                onClick={() => { onSortChange(opt.value); setShowSort(false); }}
+                                className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sortOption === opt.value ? 'text-(--accent) font-semibold' : 'text-white/70 hover:bg-white/5'}`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
 
-                    {showSort && (
-                        <div className="absolute mt-2 right-0 bg-(--surface) text-(--text) font-semibold border border-[D9D9D9] rounded-lg p-3">
-                            <label className="flex items-center">
-                                <input type="radio" name="sort" checked={sortOption === 'az'} onChange={() => onSortChange('az')} /> 
-                                <span className="ml-1"> A-Z </span>
-                            </label>
-                            <label className="flex items-center">
-                                <input type="radio" name="sort" checked={sortOption === 'za'} onChange={() => onSortChange('za')} /> 
-                                <span className="ml-1"> Z-A </span>
-                            </label>
-                            <label className="flex items-center">
-                                <input type="radio" name="sort" checked={sortOption === 'newest'} onChange={() => onSortChange('newest')} /> 
-                                <span className="ml-1"> Newest </span>
-                            </label>
-                            <label className="flex items-center">
-                                <input type="radio" name="sort" checked={sortOption === 'oldest'} onChange={() => onSortChange('oldest')} /> 
-                                <span className="ml-1"> Oldest </span>
-                            </label>
-                        </div>
-                    )}
-                </div>
+            {/* Filter */}
+            <div className="relative" ref={filterRef}>
+                <button
+                    onClick={() => { setShowFilter(f => !f); setShowSort(false); }}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full border transition-colors duration-150 cursor-pointer text-(--text) ${showFilter ? 'bg-white/15 border-white/25' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
+                    aria-label="Filter"
+                >
+                    <Filter className="w-4 h-4 text-white" />
+                </button>
+                {showFilter && (
+                    <div className={panelClass}>
+                        {[
+                            { key: 'folders', label: 'Folders' },
+                            { key: 'links', label: 'Links' },
+                            { key: 'pinnedOnly', label: 'Pinned only' },
+                        ].map(({ key, label }) => (
+                            <button
+                                key={key}
+                                onClick={() => onFilterChange({ ...filters, [key]: !filters[key] })}
+                                className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-white/70 hover:bg-white/5 transition-colors"
+                            >
+                                <span>{label}</span>
+                                <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${filters[key] ? 'bg-(--accent) border-(--accent)' : 'border-white/20'}`}>
+                                    {filters[key] && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
 
-                <div className="relative">
-                    <button 
-                        onClick={() => setShowFilter(!showFilter)}
-                        className="flex items-center gap-2 px-3 py-2 bg-(--surface) text-(--text) rounded-full border border-[D9D9D9] transition-transform duration-200 hover:scale-105">
-                        <Filter className="w-6 h-6 min-w-3.5 min-h-3.5" />
-                        <span className="hidden sm:inline">Filter</span>
-                    </button>
-
-                    {showFilter && (
-                        <div className="absolute mt-2 right-0 bg-(--surface) text-(--text) font-semibold border border-[D9D9D9] rounded-lg p-3">
-                            <label className="flex items-center">  
-                                <input type="checkbox" checked={!!filters.folders} onChange={(e) => onFilterChange({ ...filters, folders: e.target.checked })} /> 
-                                <span className="ml-1"> Folders </span>
-                            </label>
-                            <label className="flex items-center">
-                                <input type="checkbox" checked={!!filters.links} onChange={(e) => onFilterChange({ ...filters, links: e.target.checked })} /> 
-                                <span className="ml-1"> Links </span>
-                            </label>
-                            <label className="flex items-center">
-                                <input type="checkbox" checked={!!filters.pinnedOnly} onChange={(e) => onFilterChange({ ...filters, pinnedOnly: e.target.checked })} /> 
-                                <span className="ml-1"> Pinned </span>
-                            </label>
-                        </div>
-                    )}
-                </div>
-
-                <div className="hidden sm:flex">
-                    <button 
-                        onClick={() => setViewMode(!viewMode)}
-                        className={`${viewMode ? `bg-(--text) text-(--surface)` : `bg-(--surface) text-(--text)`} pl-3 pr-1.5 py-2  rounded-l-full border border-r-[0.5px] border-(--text) transition-transform duration-200 hover:scale-105 cursor-pointer`}>
-                        <LayoutGrid className="size-6" />
-                    </button>
-                    <button 
-                        onClick={() => setViewMode(!viewMode)}
-                        className={`${viewMode ? `bg-(--surface) text-(--text)` : `bg-(--text) text-(--surface)`} pr-3 pl-1.5 py-2 rounded-r-full border border-l-[0.5px] border-(--text) transition-transform duration-200 hover:scale-105 cursor-pointer`}>
-                        <List className="size-6" />
-                    </button>
-                </div>
+            {/* View toggle — desktop only */}
+            <div className="hidden sm:flex rounded-full border border-white/10 overflow-hidden">
+                <button
+                    onClick={() => setViewMode(true)}
+                    className={`p-2 transition-colors cursor-pointer text-(--text) ${viewMode ? 'bg-white/15' : 'bg-white/5 hover:bg-white/10'}`}
+                    aria-label="Grid view"
+                >
+                    <LayoutGrid className="w-4 h-4 text-white" />
+                </button>
+                <button
+                    onClick={() => setViewMode(false)}
+                    className={`p-2 transition-colors cursor-pointer text-(--text) ${!viewMode ? 'bg-white/15' : 'bg-white/5 hover:bg-white/10'}`}
+                    aria-label="List view"
+                >
+                    <List className="w-4 h-4 text-white" />
+                </button>
             </div>
         </div>
     );
 }
 
-export default Search; // Allows other files to import this component
+export default Search;

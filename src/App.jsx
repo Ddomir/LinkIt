@@ -23,7 +23,7 @@ function App() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: import.meta.env.VITE_REDIRECT_URL
+        redirectTo: import.meta.env.DEV ? `${window.location.origin}` : import.meta.env.VITE_REDIRECT_URL
       },
     });
     

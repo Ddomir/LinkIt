@@ -80,7 +80,7 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
                 />
             ))}
 
-            <div className={`${viewMode ? `grid gap-3 grid-cols-[repeat(auto-fill,minmax(224px,1fr))]` : `flex flex-col gap-3`} mt-4`}>
+            <div className={`${viewMode ? `grid gap-3 grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(224px,1fr))]` : `flex flex-col gap-3`} mt-4`}>
                 {filters?.links && sortedLinks.map(([id, link]) => (
                     <LinkCard
                         key={id}

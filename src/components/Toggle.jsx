@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export default function Toggle({ onToggle }) { // A simple toggle button for dark mode / light mode
-    const [isDark, setIsDark] = useState(true); // default: dark
-
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem('theme');
-            setIsDark(saved ? saved === 'dark' : true);
-        } catch {
-            setIsDark(true);
-        }
-    }, []);
+    const [isDark, setIsDark] = useState(true);
 
     //Apply the theme to <html> 
     useEffect(() => { 

@@ -5,7 +5,7 @@ import { getLinksByRoomId } from '../api/links'
 import { createRoomUser, joinRoom } from '../api/rooms/roomUsers'
 import { createInvite } from '../api/invites'
 import { createUser } from '../api/users/users'
-import {useState, useEffect, useRef, createContext} from 'react'
+import {useState, useEffect, useRef, useCallback, createContext} from 'react'
 import { getColors } from '../api/colors'
 import CreateRoomPopup from '../components/popups/CreateRoomPopup'
 import { removeRoomUser } from "../api/rooms/roomUsers";
@@ -30,7 +30,13 @@ export default function Dashboard({session ,callback}) {
   const [selectedRoomId, setSelectedRoomId] = useState(null)
   const [joinError, setJoinError] = useState(null)
   const [COLOR_OPTIONS, setColorOptions] = useState([])
-  const [mobileOpen, setMobileOpen] = useState(false) // State to track if the sidebar is open on mobile
+  const [mobileOpen, setMobileOpen] = useState(true) // State to track if the sidebar is open on mobile
+  const [sidebarWidth, setSidebarWidth] = useState(288) // 288px = w-72
+  const isDragging = useRef(false)
+  const dragStartX = useRef(0)
+  const dragStartWidth = useRef(0)
+  const MIN_SIDEBAR = 200
+  const MAX_SIDEBAR = 480
   const [showRoomPopup, setShowRoomPopup] = useState(false)
 
   // Add a ref to track if we've already synced this specific user ID
@@ -173,9 +179,28 @@ export default function Dashboard({session ,callback}) {
     }
   }
 
+  const onDragStart = useCallback((e) => {
+    isDragging.current = true
+    dragStartX.current = e.clientX
+    dragStartWidth.current = sidebarWidth
+
+    const onMove = (e) => {
+      if (!isDragging.current) return
+      const delta = e.clientX - dragStartX.current
+      setSidebarWidth(Math.min(MAX_SIDEBAR, Math.max(MIN_SIDEBAR, dragStartWidth.current + delta)))
+    }
+    const onUp = () => {
+      isDragging.current = false
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [sidebarWidth])
+
   return (
     <>
-      <div className="w-screen h-screen flex app-bg">
+      <div className="w-screen h-screen flex" style={{ background: 'var(--surface)' }}>
         { joinError &&
           <div className='bg-[#1a1a1a] rounded-2xl p-4 w-full max-w-sm shadow-xl border border-white/10 animate-[slide-up_200ms_ease-out]
             z-1000 absolute right-0 bottom-0 text-[#ff0000] text-xl font-bold tracking-wide px-8 m-4'>
@@ -190,19 +215,27 @@ export default function Dashboard({session ,callback}) {
           onJoin={joinRoomDB}
         />
         
-        <div className="hidden lg:block lg:flex-none h-full">
-          <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} openPopup={() => setShowRoomPopup(true)} />
+        <div className="hidden lg:flex lg:flex-none h-full relative" style={{ width: sidebarWidth }}>
+          <div className="w-full h-full">
+            <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} openPopup={() => setShowRoomPopup(true)} />
+          </div>
+          {/* Resize handle */}
+          <div
+            className="absolute right-0 top-0 bottom-0 w-3 flex items-center justify-center cursor-col-resize group z-10"
+            onMouseDown={onDragStart}
+          >
+            <div className="w-1 h-10 rounded-full bg-white/10 group-hover:bg-white/30 transition-colors duration-150" />
+          </div>
         </div>
 
-        {/* Mobile hamburger + overlay sidebar - only visible on smaller screens */}
+        {/* Mobile hamburger — fixed, only visible when sheet is closed */}
         <div className="md:hidden">
           <button
-            className ="m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2"
+            className={`m-3 p-2 rounded-md text-white bg-[#0C0A0A] z-50 fixed left-2 bottom-2 transition-all duration-300 ${mobileOpen ? 'opacity-0 pointer-events-none translate-y-2' : 'opacity-100 translate-y-0'}`}
             aria-label="Open menu"
-            onClick={() => setMobileOpen(prev => !prev)}
+            onClick={() => setMobileOpen(true)}
           >
-            {/* simple hamburger icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" className ="w-6 h-6" fill="none" viewBox=" 0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -210,7 +243,7 @@ export default function Dashboard({session ,callback}) {
           <Sidebar rooms={rooms} createRoomsDB={createRoomsDB} callback={callback} selectedRoomId={selectedRoomId} onSelectRoom={setSelectedRoomId} joinRoomDB={joinRoomDB} popupCallback={setJoinError} onLeaveRoom={leaveRoomDB} isOpen={mobileOpen} onClose={() => setMobileOpen(false)} openPopup={() => setShowRoomPopup(true)} />
         </div>
         
-        <div className="flex-1 min-w-0 h-full overflow-hidden">
+        <div className="flex-1 min-w-0 h-full overflow-hidden lg:rounded-l-2xl">
           <Room roomId={selectedRoomId} COLOR_OPTIONS={COLOR_OPTIONS} openPopup={() => setShowRoomPopup(true)} />
         </div>
       </div>

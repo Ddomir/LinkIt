@@ -11,24 +11,30 @@ function RoomIcon({ icon, className = "w-4 h-4" }) {
     return <span className={className}>{iconObj.svg}</span>;
 }
 
-
 export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId, onSelectRoom, joinRoomDB, popupCallback, isOpen, onClose, onLeaveRoom, openPopup}) {
     const [showPopup, setShowPopup] = useState(false)
     const [openMenuId, setOpenMenuId] = useState(null)
-    const [visible, setVisible] = useState(Boolean(isOpen)) // Local state to control if the sidebar is mounted at all, for animation purposes
+    const [leaveMode, setLeaveMode] = useState(false)
+    const [visible, setVisible] = useState(Boolean(isOpen))
 
-    //Escape key closes overlay when in mobile overlay mode
-    useEffect(() => { 
-        if (typeof isOpen !== 'boolean') return 
-        if (!isOpen) return 
-        const onKey = (e) => { if (e.key === 'Escape') onClose && onClose() } 
-        document.addEventListener('keydown', onKey) 
-        return () => document.removeEventListener('keydown', onKey) 
+    const isMobile = typeof isOpen === 'boolean'
+
+    useEffect(() => {
+        if (!isMobile) return
+        if (!isOpen) return
+        const onKey = (e) => { if (e.key === 'Escape') onClose && onClose() }
+        document.addEventListener('keydown', onKey)
+        return () => document.removeEventListener('keydown', onKey)
     }, [isOpen, onClose])
 
-    // Keep the exact existing sidebar markup here as 'content' 
     const content = (
-        <div className="flex flex-col surface h-full max-w-67">
+        <div className="flex flex-col surface h-full max-w-full">
+            {/* Drag handle — mobile only */}
+            {isMobile && (
+                <div className="flex justify-center pt-3 pb-1 cursor-pointer" onClick={onClose}>
+                    <div className="w-10 h-1 rounded-full bg-white/20" />
+                </div>
+            )}
 
             {/* Sidebar Header */}
             <div className="px-5 pt-4 pb-2">
@@ -46,17 +52,13 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                 </div>
             </div>
 
-            {/* <p>{sessionStorage.user?.id}</p> */}
             {/* Room list */}
             <div className="flex-1 overflow-auto px-3 py-1 scrollbar-thin">
                 <div className="flex flex-col gap-1">
                     {rooms.map(room => (
-                        <div
-                            key={room.id}
-                            className="relative group"
-                        >
+                        <div key={room.id} className="relative group">
                             <button
-                                onClick={() => { onSelectRoom(room.id); setOpenMenuId(null); }}
+                                onClick={() => { onSelectRoom(room.id); setOpenMenuId(null); setLeaveMode(false); onClose?.(); }}
                                 className={`flex items-center gap-2.5 w-full text-left rounded-xl px-3 py-2 cursor-pointer transition-colors duration-200 ease-in-out text-sm font-medium
                                     ${selectedRoomId === room.id ? 'accent text-[var(--accent-foreground)]' : 'hover:opacity-90'}`}
                             >
@@ -64,90 +66,97 @@ export default function Sidebar({rooms, createRoomsDB, callback, selectedRoomId,
                                 <span className="truncate">{room.name}</span>
                             </button>
 
-                            {/* Three-dots button, visible on hover or when menu is open */}
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === room.id ? null : room.id); }}
-                                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-opacity duration-150 cursor-pointer
-                                    ${selectedRoomId === room.id ? 'text-[var(--accent-foreground)] hover:bg-black/10' : 'hover:bg-white/10'}
-                                    ${openMenuId === room.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                                aria-label="Room options"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                    <path d="M6 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-                                </svg>
-                            </button>
+                            {/* Mobile leave mode: minus button */}
+                            {isMobile && leaveMode && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onLeaveRoom && onLeaveRoom(room.id); }}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors"
+                                    aria-label="Leave room"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                        <path fillRule="evenodd" d="M4 10a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 10Z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            )}
 
-                            {/* Dropdown menu */}
-                            {openMenuId === room.id && (
-                                <div className="absolute right-0 top-full mt-1 z-50 surface border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                            {/* Desktop: three-dots hover menu */}
+                            {!isMobile && (
+                                <>
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); onLeaveRoom && onLeaveRoom(room.id); }}
-                                        className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
+                                        onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === room.id ? null : room.id); }}
+                                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-opacity duration-150 cursor-pointer
+                                            ${selectedRoomId === room.id ? 'text-(--accent-foreground) hover:bg-black/10' : 'hover:bg-white/10'}
+                                            ${openMenuId === room.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                                        aria-label="Room options"
                                     >
-                                        Leave room
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                            <path d="M6 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                                        </svg>
                                     </button>
-                                </div>
+                                    {openMenuId === room.id && (
+                                        <div className="absolute right-0 top-full mt-1 z-50 surface border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); onLeaveRoom && onLeaveRoom(room.id); }}
+                                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-400 hover:bg-white/5 cursor-pointer transition-colors"
+                                            >
+                                                Leave room
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     ))}
                 </div>
-
-                <div className="flex grow">
-                </div>
-
-                <button
-                    className="accent rounded-full text-[var(--accent-foreground)] text-2xl p-2 px-8 cursor-pointer hover:scale-105 transition ease-in-out justify-self-center m-4"
-                    onClick={callback}
-                    id="google-logout-btn"
-                >
-                    Logout
-                </button>
             </div>
 
             {/* Bottom bar */}
             <div className="flex items-center justify-between px-5 py-4">
-                <Toggle />
-                <button className="hover:text-[#77f298] cursor-pointer transition-colors duration-150" aria-label="Settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
-                        <path fillRule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-                    </svg>
-                </button>
+                {/* <Toggle /> */}
 
-                <button className="hover:text-[#77f298] cursor-pointer transition-colors duration-150" aria-label="Profile">
+                {/* Mobile-only: manage rooms toggle */}
+                {isMobile && (
+                    <button
+                        onClick={() => setLeaveMode(m => !m)}
+                        className={`cursor-pointer transition-colors duration-150 ${leaveMode ? 'text-red-400' : 'hover:text-[#77f298]'}`}
+                        aria-label="Manage rooms"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                        </svg>
+                    </button>
+                )}
+
+                {/* Logout — exit door icon */}
+                <button
+                    onClick={callback}
+                    className="hover:text-[#77f298] cursor-pointer transition-colors duration-150"
+                    aria-label="Logout"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                     </svg>
                 </button>
             </div>
         </div>
     )
 
-    //If parent passes isOpen prop, render sidebar as overlay for mobile
-    //Otherwise, render normal sidebar for desktop
-    //keep overlay mounted during close so animation can run
     useEffect(() => {
-        if (typeof isOpen !== 'boolean') return
-        if (isOpen) {
-            setVisible(true)
-            return
-        }
-
+        if (!isMobile) return
+        if (isOpen) { setVisible(true); return }
         const id = setTimeout(() => setVisible(false), 700)
         return () => clearTimeout(id)
     }, [isOpen])
 
-    if (typeof isOpen === 'boolean') {
+    if (isMobile) {
         if (!visible) return null
-
         return (
             <div className="fixed inset-0 z-40 md:hidden">
-                {/* Backdrop: click to close; animate opacity */}
                 <div
-                    className={`absolute inset-0 bg-black transition-opacity duration-700 ease-in-out ${isOpen ? 'opacity-50' : 'opacity-0'}`}
+                    className={`absolute inset-0 bg-black transition-opacity duration-500 ease-in-out ${isOpen ? 'opacity-50' : 'opacity-0'}`}
                     onClick={onClose}
                 />
-                {/* Sliding panel: GPU-accelerated transform, will-change hint, longer duration + custom easing */}
-                <div className={`absolute left-0 top-0 bottom-0 w-72 transform-gpu will-change-transform transition-transform duration-700 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className={`absolute left-0 right-0 bottom-0 h-[92vh] rounded-t-2xl overflow-hidden transform-gpu will-change-transform transition-transform duration-500 ease-[cubic-bezier(.16,.84,.3,1)] ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}>
                     {content}
                 </div>
             </div>
