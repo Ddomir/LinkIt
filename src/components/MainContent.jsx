@@ -60,7 +60,9 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
         //new card props (roomData) passed in this order:
         //CreateLinkPopup --> Header --> Room --> MainContent
         <div className="flex-1 min-h-0 h-full p-4 overflow-auto flex flex-col gap-3">
-            {filters?.folders && sortedFolders.map(([id, link]) => (
+            {filters?.folders && (
+            <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+            {sortedFolders.map(([id, link]) => (
                 <FolderCard
                     key={id}
                     id={link.id}
@@ -79,8 +81,10 @@ export default function MainContent({ roomData, colorMap, searchQuery = '', filt
                     onDelete={onDelete ? (fid) => onDelete(fid, 'folder') : undefined}
                 />
             ))}
+            </div>
+            )}
 
-            <div className={`${viewMode ? `grid gap-3 grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(224px,1fr))]` : `flex flex-col gap-3`} mt-4`}>
+            <div className={`${viewMode ? `grid gap-3 grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(224px,1fr))]` : `flex flex-col gap-3`} ${sortedFolders.length > 0 && sortedLinks.length > 0 ? 'mt-4' : ''}`}>
                 {filters?.links && sortedLinks.map(([id, link]) => (
                     <LinkCard
                         key={id}

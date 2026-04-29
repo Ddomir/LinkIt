@@ -22,6 +22,16 @@ body {
     to   { opacity: 1; transform: translateY(0)     scale(1);    }
 }
 
+@keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0%);   }
+}
+
+@keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0%);    }
+}
+
 :root { /* Dark theme variables (always dark) */
     --bg: linear-gradient(120deg, #1E221D, #0E100E);
     --surface: #0C0A0A;

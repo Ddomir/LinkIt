@@ -18,6 +18,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
   const [viewMode, setViewMode] = useState(true); // true for tile view, false for list view
   // Stack of { folder: {id, title}, data: {name, links} }
   const [folderStack, setFolderStack] = useState([]);
+  const [navDirection, setNavDirection] = useState('forward'); // 'forward' | 'back'
   const [editItem, setEditItem] = useState(null); // item being edited
 
   const selectedFolder = folderStack.length > 0 ? folderStack[folderStack.length - 1].folder : null;
@@ -73,6 +74,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
   const openFolder = async (folder) => {
     try {
       const data = await fetchFolderContents(folder);
+      setNavDirection('forward');
       setFolderStack(prev => [...prev, { folder, data }]);
     } catch (err) {
       console.error("Failed to fetch folder contents:", err);
@@ -80,7 +82,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
   };
 
   // Pop one level; if stack empties we're back at room root
-  const closeFolder = () => setFolderStack(prev => prev.slice(0, -1));
+  const closeFolder = () => { setNavDirection('back'); setFolderStack(prev => prev.slice(0, -1)); };
 
   useEffect(() => {
     if (!roomId) return;
@@ -371,7 +373,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
 
           {/* Room root */}
           <button
-            onClick={() => setFolderStack([])}
+            onClick={() => { setNavDirection('back'); setFolderStack([]); }}
             className="text-white/50 hover:text-white transition-colors cursor-pointer"
           >
             {roomData.name}
@@ -382,7 +384,7 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
             <span key={entry.folder.id} className="flex items-center gap-1.5">
               <span className="text-white/20">/</span>
               <button
-                onClick={() => setFolderStack(prev => prev.slice(0, i + 1))}
+                onClick={() => { setNavDirection('back'); setFolderStack(prev => prev.slice(0, i + 1)); }}
                 className="text-white/50 hover:text-white transition-colors cursor-pointer"
               >
                 {entry.folder.title}
@@ -398,30 +400,13 @@ export default function Room({ roomId, COLOR_OPTIONS, openPopup, readOnly = fals
         </div>
       )}
       <div className="flex-1 min-h-0 relative overflow-hidden">
-        {/* Room view — slides out to the left when folder opens */}
         <div
-          className="absolute inset-0 transition-transform duration-300 ease-in-out"
-          style={{ transform: selectedFolder ? 'translateX(-100%)' : 'translateX(0%)' }}
+          key={folderStack.length === 0 ? '__root__' : folderStack[folderStack.length - 1].folder.id}
+          className="absolute inset-0"
+          style={{ animation: `${navDirection === 'forward' ? 'slide-in-right' : 'slide-in-left'} 280ms ease-in-out` }}
         >
           <MainContent
-            roomData={roomData}
-            colorMap={COLOR_OPTIONS}
-            searchQuery={searchQuery}
-            filters={filters}
-            sortOption={sortOption}
-            viewMode={viewMode}
-            onFolderClick={openFolder}
-            onEdit={readOnly ? null : setEditItem}
-            onDelete={readOnly ? null : (id, type) => deleteCard(id, type)}
-          />
-        </div>
-        {/* Folder view — slides in from the right when folder opens */}
-        <div
-          className="absolute inset-0 transition-transform duration-300 ease-in-out"
-          style={{ transform: selectedFolder ? 'translateX(0%)' : 'translateX(100%)' }}
-        >
-          <MainContent
-            roomData={folderData ?? { name: '', links: {} }}
+            roomData={folderStack.length === 0 ? roomData : (folderData ?? { name: '', links: {} })}
             colorMap={COLOR_OPTIONS}
             searchQuery={searchQuery}
             filters={filters}
